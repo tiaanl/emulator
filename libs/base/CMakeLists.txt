@@ -1,5 +1,6 @@
 set(HEADER_FILES
     include/base/data.h
+    include/base/object_pool.h
     include/base/platform.h
     )
 
