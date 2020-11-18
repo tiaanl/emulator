@@ -4,26 +4,22 @@
 
 namespace emulator {
 
-void create_memory(Memory* memory, U16 size) {
-  memory->data = static_cast<U8*>(malloc(size));
-  memory->size = size;
-  memory->owning = 1;
+Memory Memory::create(U16 size) {
+  Memory result = {};
+  result.data = static_cast<U8*>(malloc(size));
+  result.size = size;
+  result.owning = 1;
+  return result;
 }
 
-void init_memory(Memory* memory, U8* data, U16 size) {
-  memory->data = data;
-  memory->size = size;
-  memory->owning = 0;
-}
-
-void destroy_memory(Memory* memory) {
-  if (memory->owning) {
-    free(memory->data);
+void Memory::destroy() {
+  if (owning) {
+    free(data);
   }
 
-  memory->data = nullptr;
-  memory->size = 0;
-  memory->owning = 0;
+  data = nullptr;
+  size = 0;
+  owning = 0;
 }
 
 }  // namespace emulator

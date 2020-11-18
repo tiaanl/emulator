@@ -1,20 +1,21 @@
-#include <compiler/compiler.h>
-#include <emulator/cpu.h>
-#include <emulator/vm.h>
-
-using namespace emulator;
+#include <assembler/assembler.h>
 
 int main() {
-  U8 data[16 * 16] = {};
+  auto memory = emulator::Memory::create(1024);
 
-  U8* ptr = data;
-  ptr += compiler::emit_mov_reg_from_reg(ptr, Register::AX, Register::SP);
-  ptr += compiler::emit_mov_reg_from_lit(ptr, Register::AX, 52);
-  ptr += compiler::emit_halt(ptr);
+  U8* ptr = memory.data;
+  ptr += compiler::emit_mov_reg_from_reg(ptr, emulator::Register::AX, emulator::Register::SP);
+  ptr += compiler::emit_mov_reg_from_lit(ptr, emulator::Register::AX, 52);
+  compiler::emit_halt(ptr);
 
-  VM vm = VM_create_with_memory(data, sizeof(data));
-  VM_run(&vm);
-  VM_destroy(&vm);
+  auto cpu = emulator::CPU::create(&memory);
+
+  cpu.debug();
+  while (cpu.step() == emulator::StepResult::Continue) {
+      cpu.debug();
+  }
+
+  memory.destroy();
 
   return 0;
 }
