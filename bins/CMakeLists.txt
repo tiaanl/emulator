@@ -1,2 +1,2 @@
 add_subdirectory(compiler)
-add_subdirectory(test_compiler)
+add_subdirectory(virtual_machine)
