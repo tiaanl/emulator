@@ -126,15 +126,15 @@ private:
 
   bool is_used(uint64_t used, uint8_t position) {
     assert(position < 64);
-    return (used & (1u << position)) != 0;
+    return (used & (1llu << position)) != 0;
   }
 
   void set_used(uint64_t* used, uint8_t position) {
-    *used |= (1u << position);
+    *used |= (1llu << position);
   }
 
   void set_unused(uint64_t* used, uint8_t position) {
-    *used &= ~(1u << position);
+    *used &= ~(1llu << position);
   }
 
   T* find_open_space(Block* block) {

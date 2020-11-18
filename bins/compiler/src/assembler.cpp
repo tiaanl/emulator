@@ -13,9 +13,9 @@ int main() {
 
   // const char* source = "This is the source";
 
-  base::ObjectPool<Token> objectPool;
+  base::ObjectPool<Token> tokenPool;
   for (auto i = 0; i < 500; ++i) {
-    objectPool.emplace();
+    tokenPool.emplace();
   }
 
   return 0;

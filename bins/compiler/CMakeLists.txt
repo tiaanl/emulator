@@ -1,5 +1,5 @@
 set(SOURCE_FILES
-    src/compiler.cpp
+    src/assembler.cpp
     )
 
 base_add_executable(compiler ${SOURCE_FILES})

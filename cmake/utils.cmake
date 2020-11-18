@@ -1,7 +1,7 @@
 macro(base_set_flags target)
     if (CMAKE_CXX_COMPILER_ID MATCHES MSVC)
         # Enable warnings and multi-process compilation.
-        target_compile_options(${target} PUBLIC /EHsc /GR- /W3 /WX /MP)
+        target_compile_options(${target} PUBLIC /W4 /WX /MP)
 
         set_target_properties(${target} PROPERTIES
             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"

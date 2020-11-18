@@ -1,8 +1,9 @@
 set(HEADER_FILES
+    include/assembler/assembler.h
     )
 
 set(SOURCE_FILES
-        src/compiler.cpp
+    src/assembler.cpp
     )
 
 base_add_library(assembler ${HEADER_FILES} ${SOURCE_FILES})
