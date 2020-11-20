@@ -1,18 +1,20 @@
 #include <assembler/assembler.h>
 
+using namespace emulator;
+
 int main() {
-  auto memory = emulator::Memory::create(1024);
+  auto memory = Memory::create(1024);
 
   U8* ptr = memory.data;
-  ptr += compiler::emit_mov_reg_from_reg(ptr, emulator::Register::AX, emulator::Register::SP);
-  ptr += compiler::emit_mov_reg_from_lit(ptr, emulator::Register::AX, 52);
-  compiler::emit_halt(ptr);
+  ptr += assembler::emit_mov_reg_from_lit(ptr, Register::AX, 52);
+  ptr += assembler::emit_mov_reg_from_reg(ptr, Register::SP, Register::AX);
+  assembler::emit_halt(ptr);
 
-  auto cpu = emulator::CPU::create(&memory);
+  auto cpu = CPU::create(&memory);
 
   cpu.debug();
-  while (cpu.step() == emulator::StepResult::Continue) {
-      cpu.debug();
+  while (cpu.step() == StepResult::Continue) {
+    cpu.debug();
   }
 
   memory.destroy();

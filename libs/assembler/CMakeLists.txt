@@ -7,4 +7,4 @@ set(SOURCE_FILES
     )
 
 base_add_library(assembler ${HEADER_FILES} ${SOURCE_FILES})
-target_link_libraries(assembler PUBLIC kernel)
+target_link_libraries(assembler PUBLIC emulator)

@@ -1,12 +1,20 @@
 #ifndef PLATFORM_H_
 #define PLATFORM_H_
 
-#include <stdint.h>
+using U8 = unsigned char;
+using U16 = unsigned short;
+using U32 = unsigned int;
 
-using U8 = uint8_t;
-using U16 = uint16_t;
+static_assert(sizeof(U8) == 1);
+static_assert(sizeof(U16) == 2);
+static_assert(sizeof(U32) == 4);
 
-using I8 = int8_t;
-using I16 = uint16_t;
+using I8 = char;
+using I16 = short;
+using I32 = int;
+
+static_assert(sizeof(I8) == 1);
+static_assert(sizeof(I16) == 2);
+static_assert(sizeof(I32) == 4);
 
 #endif  // PLATFORM_H_

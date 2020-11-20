@@ -37,7 +37,7 @@ struct CPU {
 
   U16 fetch16() {
     auto ip = get_register(Register::IP);
-    U16 result = memory->data[ip] | (memory->data[ip] << 8);
+    U16 result = U16(memory->data[ip]) | U16(memory->data[ip + 1] << 8ul);
     set_register(Register::IP, ip + 2);
     return result;
   }

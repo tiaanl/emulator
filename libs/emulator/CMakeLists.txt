@@ -10,5 +10,12 @@ set(SOURCE_FILES
     src/op_codes.cpp
     )
 
-base_add_library(kernel ${HEADER_FILES} ${SOURCE_FILES})
-target_link_libraries(kernel PUBLIC base)
+set(TEST_FILES
+    tests/cpu_tests.cpp
+    )
+
+base_add_library(emulator ${HEADER_FILES} ${SOURCE_FILES})
+target_link_libraries(emulator PUBLIC base)
+
+base_add_executable(emulator_tests ${TEST_FILES})
+target_link_libraries(emulator_tests PRIVATE emulator assembler)

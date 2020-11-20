@@ -15,6 +15,25 @@ inline Register read_register(U8* data) {
   return static_cast<Register>(read_u8(data));
 }
 
+const char* register_to_string(Register reg) {
+  switch (reg) {
+    case Register::IP:
+      return "IP";
+
+    case Register::SP:
+      return "SP";
+
+    case Register::FP:
+      return "FP";
+
+    case Register::AX:
+      return "AX";
+
+    default:
+      return "<unknown>";
+  }
+}
+
 }  // namespace
 
 CPU CPU::create(Memory* memory) {
@@ -24,13 +43,13 @@ CPU CPU::create(Memory* memory) {
 StepResult CPU::step() {
   auto op_code = OpCode(fetch());
 
-  printf("Executing: %s\n", op_code_to_string(op_code));
-
   switch (op_code) {
     case OpCode::MOV_REG_FROM_REG: {
       auto to = Register(fetch());
       auto from = Register(fetch());
       set_register(to, get_register(from));
+      printf("Executing: %s %s, %s\n", op_code_to_string(op_code), register_to_string(to),
+             register_to_string(from));
       return StepResult::Continue;
     }
 
@@ -38,10 +57,13 @@ StepResult CPU::step() {
       auto to = Register(fetch());
       auto value = fetch16();
       set_register(to, value);
+      printf("Executing: %s %s, 0x%04x\n", op_code_to_string(op_code), register_to_string(to),
+             value);
       return StepResult::Continue;
     }
 
     case OpCode::HALT:
+      printf("Executing: HLT\n");
       return StepResult::Halt;
 
     default: {
