@@ -1,7 +1,5 @@
 #include "emulator/cpu.h"
 
-#include <base/data.h>
-
 #include <cassert>
 #include <cstdio>
 
@@ -10,10 +8,6 @@
 namespace emulator {
 
 namespace {
-
-inline Register read_register(U8* data) {
-  return static_cast<Register>(read_u8(data));
-}
 
 const char* register_to_string(Register reg) {
   switch (reg) {
@@ -36,8 +30,10 @@ const char* register_to_string(Register reg) {
 
 }  // namespace
 
-CPU CPU::create(Memory* memory) {
-  return {memory, 0, 0, 0, 0};
+CPU CPU::create(Bus* bus) {
+  CPU result = {};
+  result.bus = bus;
+  return result;
 }
 
 StepResult CPU::step() {

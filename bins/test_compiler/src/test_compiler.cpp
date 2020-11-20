@@ -1,4 +1,6 @@
 #include <assembler/assembler.h>
+#include <emulator/bus.h>
+#include <emulator/memory.h>
 
 using namespace emulator;
 
@@ -10,7 +12,10 @@ int main() {
   ptr += assembler::emit_mov_reg_from_reg(ptr, Register::SP, Register::AX);
   assembler::emit_halt(ptr);
 
-  auto cpu = CPU::create(&memory);
+  auto bus = Bus::create();
+  bus.add_range(0, 1024, &memory_fetch_func, &memory_store_func, &memory);
+
+  auto cpu = CPU::create(&bus);
 
   cpu.debug();
   while (cpu.step() == StepResult::Continue) {

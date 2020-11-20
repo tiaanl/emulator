@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstdint>
 #include <cstdlib>
 #include <new>
 #include <utility>
@@ -79,9 +80,7 @@ private:
   };
 
   T* find_block_with_open_space() {
-    printf("Finding block with open space.\n");
     if (!first_block_) {
-      printf("Pool is empty.\n");
       first_block_ = allocate_block();
     }
 
@@ -114,7 +113,6 @@ private:
   }
 
   Block* allocate_block() {
-    printf("Allocating new block.\n");
     auto* block = static_cast<Block*>(std::malloc(sizeof(Block)));
 
     block->used = 0;

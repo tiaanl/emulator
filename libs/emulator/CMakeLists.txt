@@ -1,10 +1,12 @@
 set(HEADER_FILES
+    include/emulator/bus.h
     include/emulator/cpu.h
     include/emulator/memory.h
     include/emulator/op_codes.h
     )
 
 set(SOURCE_FILES
+    src/bus.cpp
     src/cpu.cpp
     src/memory.cpp
     src/op_codes.cpp

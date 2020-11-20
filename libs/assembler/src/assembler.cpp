@@ -2,7 +2,7 @@
 #include <emulator/cpu.h>
 #include <emulator/op_codes.h>
 
-namespace compiler {
+namespace assembler {
 
 namespace {
 
@@ -37,4 +37,4 @@ U8 emit_halt(U8* data) {
   return 1;
 }
 
-}  // namespace compiler
+}  // namespace assembler

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "emulator/memory.h"
+#include "emulator/bus.h"
 
 namespace emulator {
 
@@ -19,10 +19,10 @@ enum class StepResult : U8 {
 };
 
 struct CPU {
-  Memory* memory;
+  Bus* bus;
   U16 registers[(U8)Register::Count];
 
-  static CPU create(Memory* memory);
+  static CPU create(Bus* memory);
 
   StepResult step();
 
@@ -30,14 +30,14 @@ struct CPU {
 
   U8 fetch() {
     auto ip = get_register(Register::IP);
-    auto result = memory->data[ip];
+    auto result = bus->fetch(ip);
     set_register(Register::IP, ip + 1);
     return result;
   }
 
   U16 fetch16() {
     auto ip = get_register(Register::IP);
-    U16 result = U16(memory->data[ip]) | U16(memory->data[ip + 1] << 8ul);
+    U16 result = U16(bus->fetch(ip)) | U16(bus->fetch(ip + 1) << 8ul);
     set_register(Register::IP, ip + 2);
     return result;
   }
