@@ -1,5 +1,7 @@
 #pragma once
 
+namespace emulator {
+
 enum class OpCode : U8 {
   // MOV AX, SP
   MOV_REG_FROM_REG = 0x10,
@@ -12,3 +14,5 @@ enum class OpCode : U8 {
 };
 
 const char* op_code_to_string(OpCode op_code);
+
+}  // namespace emulator

@@ -1,5 +1,7 @@
 #include "emulator/op_codes.h"
 
+namespace emulator {
+
 const char* op_code_to_string(OpCode op_code) {
   switch (op_code) {
     case OpCode::MOV_REG_FROM_REG:
@@ -13,3 +15,5 @@ const char* op_code_to_string(OpCode op_code) {
       return "???";
   }
 }
+
+}  // namespace emulator
