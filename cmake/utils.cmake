@@ -8,7 +8,7 @@ macro(base_set_flags target)
             )
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang|GNU")
         # Enable warnings.
-        target_compile_options(${target} PUBLIC -Wall -Wextra -pedantic -Werror)
+        target_compile_options(${target} PUBLIC -Wall -Wextra -pedantic) # -Werror)
     endif ()
 endmacro(base_set_flags)
 
