@@ -7,6 +7,7 @@ macro(base_set_flags target)
             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
             )
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang|GNU")
+        target_compile_options(${target} PUBLIC -fno-exceptions -fno-rtti) # -Werror)
         # Enable warnings.
         target_compile_options(${target} PUBLIC -Wall -Wextra -pedantic) # -Werror)
     endif ()

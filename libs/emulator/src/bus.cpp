@@ -16,23 +16,27 @@ void Bus::add_range(U16 start_address, U16 size, FetchFunc fetch_func, StoreFunc
   first_node = new_node;
 }
 
-U8 Bus::fetch(U16 address) {
+U8 Bus::fetch(U16 address) const {
   for (auto current = first_node; current; current = current->next) {
     if (address >= current->start_address && address < current->start_address + current->size) {
-      return current->fetch_func(current->obj, address);
+      return current->fetch_func(current->obj, address - current->start_address);
     }
   }
+
+  assert(0);  // No address in range.
 
   return 0x00;
 }
 
-void Bus::store(U16 address, U8 value) {
+void Bus::store(U16 address, U8 value) const {
   for (auto current = first_node; current; current = current->next) {
     if (address >= current->start_address && address < current->start_address + current->size) {
-      current->store_func(current->obj, address, value);
+      current->store_func(current->obj, address - current->start_address, value);
       return;
     }
   }
+
+  assert(0);  // No address in range.
 }
 
 }  // namespace emulator

@@ -25,8 +25,8 @@ struct Bus {
   void add_range(U16 start_address, U16 size, FetchFunc fetch_func, StoreFunc store_func,
                  void* obj);
 
-  U8 fetch(U16 address);
-  void store(U16 address, U8 value);
+  U8 fetch(U16 address) const;
+  void store(U16 address, U8 value) const;
 };
 
 }  // namespace emulator

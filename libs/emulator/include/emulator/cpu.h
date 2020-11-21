@@ -5,10 +5,10 @@
 namespace emulator {
 
 enum class Register : U8 {
-  IP = 0x00,
-  SP = 0x01,
-  FP = 0x02,
-  AX = 0x03,
+  IP,
+  CF,
+  AX,
+  BX,
 
   Count,
 };
@@ -22,31 +22,31 @@ struct CPU {
   Bus* bus;
   U16 registers[(U8)Register::Count];
 
-  static CPU create(Bus* memory);
+  static CPU create(Bus* bus);
 
   StepResult step();
 
   void debug();
 
-  U8 fetch() {
+  inline U8 fetch() {
     auto ip = get_register(Register::IP);
     auto result = bus->fetch(ip);
     set_register(Register::IP, ip + 1);
     return result;
   }
 
-  U16 fetch16() {
+  inline U16 fetch16() {
     auto ip = get_register(Register::IP);
     U16 result = U16(bus->fetch(ip)) | U16(bus->fetch(ip + 1) << 8ul);
     set_register(Register::IP, ip + 2);
     return result;
   }
 
-  U16 get_register(Register reg) {
+  inline U16 get_register(Register reg) {
     return registers[U8(reg)];
   }
 
-  void set_register(Register reg, U16 value) {
+  inline void set_register(Register reg, U16 value) {
     registers[U8(reg)] = value;
   }
 };
