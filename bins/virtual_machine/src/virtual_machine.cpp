@@ -2,6 +2,7 @@
 // After glad/glad.h
 #include <GLFW/glfw3.h>
 #include <assembler/assembler.h>
+#include <assembler/disassembler.h>
 #include <emulator/cpu.h>
 #include <emulator/memory.h>
 #include <virtual_machine/graphics_mode.h>
@@ -41,8 +42,6 @@ int main() {
   GraphicsMode graphics_mode;
   graphics_mode.init(g_screen_width, g_screen_height);
 
-  glfwShowWindow(window);
-
   Memory memory(1024);
   auto bus = emulator::Bus::create();
   bus.add_range(0x0000, 0x0000, memory.size(), emulator::Memory::load, emulator::Memory::store,
@@ -52,25 +51,29 @@ int main() {
                 &graphics_mode);
   CPU cpu(&bus);
 
-  /*
-  U8* ip = memory.data;
+  assembler::Assembler a(memory.data(), memory.size());
 
-  ip += assembler::emit_mov_reg_from_lit(ip, Register::DS, 0xA000);
-  ip += assembler::emit_mov_reg_from_lit(ip, Register::DI, 0x0000);
-  ip += assembler::emit_mov_reg_from_lit(ip, Register::CX, g_screen_width);
-  ip += assembler::emit_multiply(ip, emulator::Register::CX, 0x10);
-  auto label_loop = U16(ip - memory.data);
-  ip += assembler::emit_mov_reg_addr_from_lit(ip, Register::DI, 255);
-  ip += assembler::emit_add(ip, emulator::Register::DI, 1);
-  ip += assembler::emit_subtract(ip, emulator::Register::CX, 1);
-  ip += assembler::emit_compare_reg_to_lit(ip, emulator::Register::CX, 0);
-  ip += assembler::emit_jump_if_not_equal(ip, label_loop);
-  assembler::emit_halt(ip);
+  auto count = 0;
+  count += a.emit_mov_reg_from_lit(Register::DS, 0xA000);
+  count += a.emit_mov_reg_from_lit(Register::DI, 0x0000);
+  count += a.emit_mov_reg_from_lit(Register::CX, 1);
+  // count += a.emit_multiply(emulator::Register::CX, 0x10);
+  auto label_loop = a.label();
+  count += a.emit_mov_reg_addr_from_lit(Register::DI, 255);
+  count += a.emit_add(emulator::Register::DI, 1);
+  count += a.emit_subtract(emulator::Register::CX, 1);
+  count += a.emit_compare_reg_to_lit(emulator::Register::CX, 0);
+  count += a.emit_jump_if_not_equal(label_loop);
+  count += a.emit_halt();
 
-  printf("Wrote %zu bytes of instructions\n", ip - memory.data);
-  */
+  printf("Wrote %d bytes of instructions\n", count);
 
-  bus.store(0x0000, 0x0000, 0xFF);
+  assembler::Disassembler d(memory.data(), memory.size());
+  d.disassemble([](const char* line) {
+    printf("%s\n", line);
+  });
+
+  glfwShowWindow(window);
 
   bool running = true;
 

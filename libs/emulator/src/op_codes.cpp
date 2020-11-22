@@ -1,6 +1,7 @@
 #include "emulator/op_codes.h"
 
 #include <cassert>
+#include <cstdio>
 
 namespace emulator {
 
@@ -37,6 +38,7 @@ const char* op_code_to_string(U8 op_code) {
       return "HALT";
 
     default:
+      printf("Invalid op_code found: %d\n", op_code);
       assert(0);
   }
 }

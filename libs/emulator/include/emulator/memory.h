@@ -14,6 +14,10 @@ public:
     return size_;
   }
 
+  U8* data() const {
+    return data_.get();
+  }
+
   static U8 load(void* obj, U16 addr) {
     auto memory = (Memory*)obj;
     assert(addr < memory->size_);

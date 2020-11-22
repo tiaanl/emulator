@@ -19,7 +19,7 @@ void Bus::add_range(U16 segment, U16 offset, U32 size, FetchFunc fetch_func, Sto
 }
 
 U8 Bus::fetch(U16 segment, U16 offset) const {
-  auto address = (segment << 4u) + offset;
+  U16 address = (segment << 4u) + offset;
   for (auto current = first_node; current; current = current->next) {
     if (address >= current->start_address && address < current->start_address + current->size) {
       return current->fetch_func(current->obj, address - current->start_address);
@@ -33,7 +33,7 @@ U8 Bus::fetch(U16 segment, U16 offset) const {
 }
 
 void Bus::store(U16 segment, U16 offset, U8 value) const {
-  auto address = (segment << 4u) + offset;
+  U16 address = (segment << 4u) + offset;
   for (auto current = first_node; current; current = current->next) {
     if (address >= current->start_address && address < current->start_address + current->size) {
       current->store_func(current->obj, address - current->start_address, value);

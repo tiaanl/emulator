@@ -5,7 +5,7 @@
 
 #include "emulator/op_codes.h"
 
-#define PRINT_ASSEMBLY 0
+#define PRINT_ASSEMBLY 1
 
 namespace emulator {
 
@@ -26,8 +26,8 @@ StepResult CPU::step() {
   U8 op_code = fetch();
 
 #if PRINT_ASSEMBLY > 0
-  debug();
-  printf("Executing: %s ", op_code_to_string(op_code));
+   debug();
+   printf("Executing: %s ", op_code_to_string(op_code));
 #endif
 
   switch (op_code) {
@@ -63,12 +63,12 @@ StepResult CPU::step() {
     }
 
     case OpCode::MOV_REG_ADDR_FROM_LIT: {
-      auto reg = fetch();
+      auto reg = Register(fetch());
       auto value = fetch();
       auto ds = registers_.ds();
-      bus_->store(ds, registers_.get(emulator::Register(reg)), value);
+      bus_->store(ds, registers_.get(reg), value);
 #if PRINT_ASSEMBLY > 0
-      printf("[%s], %d\n", emulator::register_to_string(emulator::Register(reg)), value);
+      printf("[%s], %d\n", register_to_string(Register(reg)), value);
 #endif
       break;
     }
@@ -119,27 +119,7 @@ StepResult CPU::step() {
       if (register_value >= value) cf |= CompareFlags::GreaterThanOrEqual;
       registers_.cf(cf);
 #if PRINT_ASSEMBLY > 0
-      printf("%s, %d\n", emulator::register_to_string(reg), value);
-#endif
-      break;
-    }
-
-    case OpCode::SUBTRACT: {
-      auto reg = Register(fetch());
-      auto value = fetch16();
-      registers_.set(reg, registers_.get(reg) - value);
-#if PRINT_ASSEMBLY > 0
-      printf("%s, %d\n", emulator::register_to_string(reg), value);
-#endif
-      break;
-    }
-
-    case OpCode::MULTIPLY: {
-      auto reg = Register(fetch());
-      auto value = fetch16();
-      registers_.set(reg, registers_.get(reg) * value);
-#if PRINT_ASSEMBLY > 0
-      printf("%s, %d\n", emulator::register_to_string(reg), value);
+      printf("%s, %d\n", register_to_string(reg), value);
 #endif
       break;
     }
@@ -149,7 +129,27 @@ StepResult CPU::step() {
       auto value = fetch16();
       registers_.set(reg, registers_.get(reg) + value);
 #if PRINT_ASSEMBLY > 0
-      printf("%s, %d\n", emulator::register_to_string(reg), value);
+      printf("%s, %d\n", register_to_string(reg), value);
+#endif
+      break;
+    }
+
+    case OpCode::SUBTRACT: {
+      auto reg = Register(fetch());
+      auto value = fetch16();
+      registers_.set(reg, registers_.get(reg) - value);
+#if PRINT_ASSEMBLY > 0
+      printf("%s, %d\n", register_to_string(reg), value);
+#endif
+      break;
+    }
+
+    case OpCode::MULTIPLY: {
+      auto reg = Register(fetch());
+      auto value = fetch16();
+      registers_.set(reg, registers_.get(reg) * value);
+#if PRINT_ASSEMBLY > 0
+      printf("%s, %d\n", register_to_string(reg), value);
 #endif
       break;
     }
