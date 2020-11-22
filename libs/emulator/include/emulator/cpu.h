@@ -4,6 +4,25 @@
 
 namespace emulator {
 
+// 8086/8088
+//
+// AX (AH/AL) = Primary Accumulator
+// BX (BH/BL) = Base Accumulator
+// CX (CH/CL) = Counter Accumulator
+// DX (DH/DL) = Other Accumulator
+//
+// CS = Code Segment
+// DS = Data Segment
+// ES = Extra Segment
+// SS = Stack Segment
+//
+// SI = Source Index
+// DI = Destination Index
+// BP = Base Pointer
+// SP = Stack Pointer
+// IP = Instruction Pointer
+// Flags = Various CPU Flags
+
 enum class Register : U8 {
   CS,  // Code Segment
   IP,  // Instruction Pointer

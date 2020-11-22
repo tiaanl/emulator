@@ -47,14 +47,14 @@ int main() {
   auto bus = emulator::Bus::create();
   bus.add_range(0x0000, 0x0000, memory.size, emulator::memory_fetch_func,
                 emulator::memory_store_func, &memory);
-  bus.add_range(0xB800, 0x0000, U32(g_screen_width * g_screen_height),
+  bus.add_range(0xA000, 0x0000, U32(g_screen_width * g_screen_height),
                 GraphicsMode::graphics_mode_fetch_func, GraphicsMode::graphics_mode_store_func,
                 &graphics_mode);
   auto cpu = emulator::CPU::create(&bus);
 
   U8* ip = memory.data;
 
-  ip += assembler::emit_mov_reg_from_lit(ip, Register::DS, 0xB800);
+  ip += assembler::emit_mov_reg_from_lit(ip, Register::DS, 0xA000);
   ip += assembler::emit_mov_reg_from_lit(ip, Register::DI, 0x0000);
   ip += assembler::emit_mov_reg_from_lit(ip, Register::CX, g_screen_width);
   ip += assembler::emit_multiply(ip, emulator::Register::CX, 0x10);
@@ -64,7 +64,6 @@ int main() {
   ip += assembler::emit_subtract(ip, emulator::Register::CX, 1);
   ip += assembler::emit_compare_reg_to_lit(ip, emulator::Register::CX, 0);
   ip += assembler::emit_jump_if_not_equal(ip, label_loop);
-  ip += assembler::emit_jump_addr(ip, 0);
   assembler::emit_halt(ip);
 
   printf("Wrote %zu bytes of instructions\n", ip - memory.data);
@@ -74,6 +73,7 @@ int main() {
   std::thread t([&cpu, &running]() {
     while (running && cpu.step() != emulator::StepResult::Halt) {
     }
+    printf("Program exit.\n");
   });
 
   while (!glfwWindowShouldClose(window)) {
