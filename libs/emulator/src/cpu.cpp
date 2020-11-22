@@ -173,7 +173,7 @@ void CPU::debug() {
   for (U8 i = 0; i < U8(Register::Count); ++i) {
     printf("%s: 0x%04x  ", register_to_string(Register(i)), registers_.get(Register(i)));
   }
-  puts("");
+  putchar('\n');
 }
 
 }  // namespace emulator
