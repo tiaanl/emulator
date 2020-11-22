@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <cstring>
 
-int main(int argc, char** argv) {
+int main() {
   auto source = R"(
     MOV   ax, 50
     MOV   ax, ip
@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
     HALT
   )";
 
-  auto parser = compiler::Parser::create(source, strlen(source));
+  auto parser = compiler::Parser(source, strlen(source));
 
   auto parsing = true;
   while (parsing) {

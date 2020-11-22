@@ -26,20 +26,14 @@ Token eof_token(U16 length) {
 
 }  // namespace
 
-// static
-Parser Parser::create(const char* source, U16 length) {
-  Parser result = {};
-  result.source = source;
-  result.length = length;
-  return result;
-}
+Parser::Parser(const char* source, U16 length) : source_(source), length_(length), current_(0) {}
 
 Token Parser::peek_token() {
-  if (current >= length) {
-    return eof_token(length);
+  if (current_ >= length_) {
+    return eof_token(length_);
   }
 
-  auto ch = source[current];
+  auto ch = source_[current_];
 
   if (is_whitespace(ch)) {
     return peek_whitespace();
@@ -56,7 +50,7 @@ Token Parser::peek_token() {
   if (ch == ',') {
     return Token{
         TokenType::Comma,
-        current,
+        current_,
         1,
     };
   }
@@ -64,59 +58,59 @@ Token Parser::peek_token() {
   if (ch == ':') {
     return Token{
         TokenType::Colon,
-        current,
+        current_,
         1,
     };
   }
 
   return {
       TokenType::Unknown,
-      current,
+      current_,
       0,
   };
 }
 
 Token Parser::consume_token() {
   auto token = peek_token();
-  current += token.length;
+  current_ += token.length;
   return token;
 }
 
 Token Parser::peek_whitespace() {
   U16 count = 0;
-  while (is_whitespace(source[current + count]) && current + count < length) {
+  while (is_whitespace(source_[current_ + count]) && current_ + count < length_) {
     ++count;
   }
 
   return {
       TokenType::Whitespace,
-      current,
+      current_,
       count,
   };
 }
 
 Token Parser::peek_letters() {
   U16 count = 0;
-  while (is_letter(source[current + count]) && current + count < length) {
+  while (is_letter(source_[current_ + count]) && current_ + count < length_) {
     ++count;
   }
 
   return {
       TokenType::Word,
-      current,
+      current_,
       count,
   };
 }
 
 Token Parser::peek_numbers() {
   U16 count = 0;
-  while (is_number(source[current + count]) && current + count < length) {
+  while (is_number(source_[current_ + count]) && current_ + count < length_) {
     ++count;
   }
 
   return {
       TokenType::Number,
-      current,
+      current_,
       count,
   };
 }

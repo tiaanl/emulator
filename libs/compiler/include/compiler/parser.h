@@ -18,13 +18,9 @@ struct Token {
   U16 length;
 };
 
-struct Parser {
-  const char* source;
-  U16 length;
-
-  U16 current;
-
-  static Parser create(const char* source, U16 length);
+class Parser {
+public:
+  Parser(const char* source, U16 length);
 
   Token peek_token();
   Token consume_token();
@@ -33,6 +29,11 @@ private:
   Token peek_whitespace();
   Token peek_letters();
   Token peek_numbers();
+
+  const char* source_;
+  U16 length_;
+
+  U16 current_;
 };
 
 }  // namespace compiler
