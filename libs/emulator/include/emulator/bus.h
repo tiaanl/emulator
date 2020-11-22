@@ -9,8 +9,8 @@ struct Bus {
   using StoreFunc = void (*)(void*, U16, U8);
 
   struct BusNode {
-    U16 start_address;
-    U16 size;
+    U32 start_address;
+    U32 size;
     FetchFunc fetch_func;
     StoreFunc store_func;
     void* obj;
@@ -22,11 +22,11 @@ struct Bus {
 
   static Bus create();
 
-  void add_range(U16 start_address, U16 size, FetchFunc fetch_func, StoreFunc store_func,
+  void add_range(U16 segment, U16 offset, U32 size, FetchFunc fetch_func, StoreFunc store_func,
                  void* obj);
 
-  U8 fetch(U16 address) const;
-  void store(U16 address, U8 value) const;
+  U8 fetch(U16 segment, U16 offset) const;
+  void store(U16 segment, U16 offset, U8 value) const;
 };
 
 }  // namespace emulator

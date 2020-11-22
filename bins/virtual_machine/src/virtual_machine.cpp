@@ -7,10 +7,13 @@
 #include <virtual_machine/graphics_mode.h>
 
 #include <cstdio>
+#include <thread>
 
 const I32 g_screen_width = 320;
 const I32 g_screen_height = 200;
 const I32 g_screen_zoom = 3;
+
+using namespace emulator;
 
 int main() {
   if (glfwInit() != GLFW_TRUE) {
@@ -42,47 +45,47 @@ int main() {
 
   auto memory = emulator::Memory::create(1024);
   auto bus = emulator::Bus::create();
-  bus.add_range(0, memory.size, emulator::memory_fetch_func, emulator::memory_store_func, &memory);
-  bus.add_range(0xB800, U16(g_screen_width * g_screen_height),
+  bus.add_range(0x0000, 0x0000, memory.size, emulator::memory_fetch_func,
+                emulator::memory_store_func, &memory);
+  bus.add_range(0xB800, 0x0000, U32(g_screen_width * g_screen_height),
                 GraphicsMode::graphics_mode_fetch_func, GraphicsMode::graphics_mode_store_func,
                 &graphics_mode);
   auto cpu = emulator::CPU::create(&bus);
 
   U8* ip = memory.data;
 
-  ip += assembler::emit_mov_reg_from_lit(ip, emulator::Register::AX, 0xB800);
-  ip += assembler::emit_mov_reg_from_lit(ip, emulator::Register::BX, g_screen_width);
-  ip += assembler::emit_multiply(ip, emulator::Register::BX, g_screen_height / 2);
+  ip += assembler::emit_mov_reg_from_lit(ip, Register::DS, 0xB800);
+  ip += assembler::emit_mov_reg_from_lit(ip, Register::DI, 0x0000);
+  ip += assembler::emit_mov_reg_from_lit(ip, Register::CX, g_screen_width);
+  ip += assembler::emit_multiply(ip, emulator::Register::CX, 0x10);
   auto label_loop = U16(ip - memory.data);
-  ip += assembler::emit_mov_reg_addr_from_lit(ip, emulator::Register::AX, 255);
-  ip += assembler::emit_add(ip, emulator::Register::AX, 1);
-  ip += assembler::emit_subtract(ip, emulator::Register::BX, 1);
-  ip += assembler::emit_compare_reg_to_lit(ip, emulator::Register::BX, 0);
+  ip += assembler::emit_mov_reg_addr_from_lit(ip, Register::DI, 255);
+  ip += assembler::emit_add(ip, emulator::Register::DI, 1);
+  ip += assembler::emit_subtract(ip, emulator::Register::CX, 1);
+  ip += assembler::emit_compare_reg_to_lit(ip, emulator::Register::CX, 0);
   ip += assembler::emit_jump_if_not_equal(ip, label_loop);
   ip += assembler::emit_jump_addr(ip, 0);
   assembler::emit_halt(ip);
 
   printf("Wrote %zu bytes of instructions\n", ip - memory.data);
 
-  U64 ticks = 0;
-
   bool running = true;
+
+  std::thread t([&cpu, &running]() {
+    while (running && cpu.step() != emulator::StepResult::Halt) {
+    }
+  });
+
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
 
-    if (running && cpu.step() == emulator::StepResult::Halt) {
-      running = false;
-    }
-
-    printf("%d\n", cpu.get_register(emulator::Register::BX));
-    ++ticks;
-    if (ticks > 2000) {
-      ticks %= 2000;
-      graphics_mode.render();
-      glfwSwapBuffers(window);
-      // graphics_mode.clear_screen(127);
-    }
+    // graphics_mode.clear_screen(127);
+    graphics_mode.render();
+    glfwSwapBuffers(window);
   }
+
+  running = false;
+  t.join();
 
   graphics_mode.destroy();
 

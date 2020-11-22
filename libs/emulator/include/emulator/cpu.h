@@ -5,10 +5,18 @@
 namespace emulator {
 
 enum class Register : U8 {
-  IP,
-  CF,
-  AX,
+  CS,  // Code Segment
+  IP,  // Instruction Pointer
+
+  DS,  // Data Segment
+  DI,  // Data Index
+
+  CF,  // Carrier Flags
+
+  AX,  // Accumulator
   BX,
+  CX,  // Counter
+  DX,  // Data
 
   Count,
 };
@@ -29,15 +37,17 @@ struct CPU {
   void debug();
 
   inline U8 fetch() {
+    auto cs = get_register(Register::CS);
     auto ip = get_register(Register::IP);
-    auto result = bus->fetch(ip);
+    auto result = bus->fetch(cs, ip);
     set_register(Register::IP, ip + 1);
     return result;
   }
 
   inline U16 fetch16() {
+    auto cs = get_register(Register::CS);
     auto ip = get_register(Register::IP);
-    U16 result = U16(bus->fetch(ip)) | U16(bus->fetch(ip + 1) << 8ul);
+    U16 result = U16(bus->fetch(cs, ip)) | U16(bus->fetch(cs, ip + 1) << 8ul);
     set_register(Register::IP, ip + 2);
     return result;
   }

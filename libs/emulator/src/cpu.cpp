@@ -5,7 +5,7 @@
 
 #include "emulator/op_codes.h"
 
-#define PRINT_ASSEMBLY 1
+#define PRINT_ASSEMBLY 0
 
 namespace emulator {
 
@@ -13,8 +13,17 @@ namespace {
 
 const char* register_to_string(Register reg) {
   switch (reg) {
+    case Register::CS:
+      return "CS";
+
     case Register::IP:
       return "IP";
+
+    case Register::DS:
+      return "DS";
+
+    case Register::DI:
+      return "DI";
 
     case Register::CF:
       return "CF";
@@ -24,6 +33,12 @@ const char* register_to_string(Register reg) {
 
     case Register::BX:
       return "BX";
+
+    case Register::CX:
+      return "CX";
+
+    case Register::DX:
+      return "DX";
 
     default:
       assert(0);
@@ -79,7 +94,8 @@ StepResult CPU::step() {
     case OpCode::MOV_ADDR_FROM_LIT: {
       auto addr = fetch16();
       auto value = fetch();
-      bus->store(addr, value);
+      auto ds = get_register(Register::DS);
+      bus->store(ds, addr, value);
 #if PRINT_ASSEMBLY > 0
       printf("0x%04x, %d\n", addr, value);
 #endif
@@ -89,7 +105,8 @@ StepResult CPU::step() {
     case OpCode::MOV_REG_ADDR_FROM_LIT: {
       auto reg = fetch();
       auto value = fetch();
-      bus->store(get_register(emulator::Register(reg)), value);
+      auto ds = get_register(Register::DS);
+      bus->store(ds, get_register(emulator::Register(reg)), value);
 #if PRINT_ASSEMBLY > 0
       printf("[%s], %d\n", emulator::register_to_string(emulator::Register(reg)), value);
 #endif
