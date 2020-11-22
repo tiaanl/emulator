@@ -3,6 +3,7 @@ set(HEADER_FILES
     include/emulator/cpu.h
     include/emulator/memory.h
     include/emulator/op_codes.h
+    include/emulator/registers.h
     )
 
 set(SOURCE_FILES
@@ -10,6 +11,7 @@ set(SOURCE_FILES
     src/cpu.cpp
     src/memory.cpp
     src/op_codes.cpp
+    src/registers.cpp
     )
 
 set(TEST_FILES

@@ -50,7 +50,7 @@ int main() {
   bus.add_range(0xA000, 0x0000, U32(g_screen_width * g_screen_height),
                 GraphicsMode::graphics_mode_fetch_func, GraphicsMode::graphics_mode_store_func,
                 &graphics_mode);
-  auto cpu = emulator::CPU::create(&bus);
+  CPU cpu(&bus);
 
   U8* ip = memory.data;
 
