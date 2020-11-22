@@ -52,7 +52,6 @@ bool GraphicsMode::init(I16 screen_width, I16 screen_height) {
   screen_height_ = screen_height;
 
   int buffer_size = screen_width * screen_height;
-  printf("buffer size: %d\n", buffer_size);
   color_buffer_ = (U8*)malloc(buffer_size);
   memset(color_buffer_, 0, buffer_size);
 

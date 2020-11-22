@@ -1,25 +1,34 @@
 #pragma once
 
+#include <cassert>
+#include <memory>
+
 namespace emulator {
 
-struct Memory {
-  U8* data;
-  U16 size;
-  U8 owning;
+class Memory {
+public:
+  explicit Memory(U16 size);
+  ~Memory();
 
-  static Memory create(U16 size);
+  U16 size() const {
+    return size_;
+  }
 
-  void destroy();
+  static U8 load(void* obj, U16 addr) {
+    auto memory = (Memory*)obj;
+    assert(addr < memory->size_);
+    return memory->data_[addr];
+  }
+
+  static void store(void* obj, U16 addr, U8 value) {
+    auto memory = (Memory*)obj;
+    assert(addr < memory->size_);
+    memory->data_[addr] = value;
+  }
+
+private:
+  U16 size_;
+  std::unique_ptr<U8[]> data_;
 };
-
-inline U8 memory_fetch_func(void* obj, U16 addr) {
-  auto memory = (Memory*)obj;
-  return memory->data[addr];
-}
-
-inline void memory_store_func(void* obj, U16 addr, U8 value) {
-  auto memory = (Memory*)obj;
-  memory->data[addr] = value;
-}
 
 }  // namespace emulator

@@ -43,15 +43,16 @@ int main() {
 
   glfwShowWindow(window);
 
-  auto memory = emulator::Memory::create(1024);
+  Memory memory(1024);
   auto bus = emulator::Bus::create();
-  bus.add_range(0x0000, 0x0000, memory.size, emulator::memory_fetch_func,
-                emulator::memory_store_func, &memory);
+  bus.add_range(0x0000, 0x0000, memory.size(), emulator::Memory::load, emulator::Memory::store,
+                &memory);
   bus.add_range(0xA000, 0x0000, U32(g_screen_width * g_screen_height),
                 GraphicsMode::graphics_mode_fetch_func, GraphicsMode::graphics_mode_store_func,
                 &graphics_mode);
   CPU cpu(&bus);
 
+  /*
   U8* ip = memory.data;
 
   ip += assembler::emit_mov_reg_from_lit(ip, Register::DS, 0xA000);
@@ -67,6 +68,9 @@ int main() {
   assembler::emit_halt(ip);
 
   printf("Wrote %zu bytes of instructions\n", ip - memory.data);
+  */
+
+  bus.store(0x0000, 0x0000, 0xFF);
 
   bool running = true;
 
