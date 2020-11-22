@@ -54,7 +54,7 @@ StepResult CPU::step() {
     case OpCode::MOV_ADDR_FROM_LIT: {
       auto addr = fetch16();
       auto value = fetch();
-      auto ds = registers_.DS();
+      auto ds = registers_.ds();
       bus_->store(ds, addr, value);
 #if PRINT_ASSEMBLY > 0
       printf("0x%04x, %d\n", addr, value);
@@ -65,7 +65,7 @@ StepResult CPU::step() {
     case OpCode::MOV_REG_ADDR_FROM_LIT: {
       auto reg = fetch();
       auto value = fetch();
-      auto ds = registers_.DS();
+      auto ds = registers_.ds();
       bus_->store(ds, registers_.get(emulator::Register(reg)), value);
 #if PRINT_ASSEMBLY > 0
       printf("[%s], %d\n", emulator::register_to_string(emulator::Register(reg)), value);
@@ -75,7 +75,7 @@ StepResult CPU::step() {
 
     case OpCode::JUMP_ADDR: {
       auto addr = fetch16();
-      registers_.IP(addr);
+      registers_.ip(addr);
 #if PRINT_ASSEMBLY > 0
       printf("0x%04x\n", addr);
 #endif
@@ -84,9 +84,9 @@ StepResult CPU::step() {
 
     case JUMP_IF_EQUAL: {
       auto addr = fetch16();
-      auto cf = registers_.CF();
+      auto cf = registers_.cf();
       if (cf & CompareFlags::Equal) {
-        registers_.IP(addr);
+        registers_.ip(addr);
       }
 #if PRINT_ASSEMBLY > 0
       printf("0x%04x\n", addr);
@@ -96,9 +96,9 @@ StepResult CPU::step() {
 
     case JUMP_IF_NOT_EQUAL: {
       auto addr = fetch16();
-      auto cf = registers_.CF();
+      auto cf = registers_.cf();
       if (cf & CompareFlags::NotEqual) {
-        registers_.IP(addr);
+        registers_.ip(addr);
       }
 #if PRINT_ASSEMBLY > 0
       printf("0x%04x\n", addr);
@@ -117,7 +117,7 @@ StepResult CPU::step() {
       if (register_value <= value) cf |= CompareFlags::LessThanOrEqual;
       if (register_value > value) cf |= CompareFlags::GreaterThan;
       if (register_value >= value) cf |= CompareFlags::GreaterThanOrEqual;
-      registers_.CF(cf);
+      registers_.cf(cf);
 #if PRINT_ASSEMBLY > 0
       printf("%s, %d\n", emulator::register_to_string(reg), value);
 #endif

@@ -53,28 +53,28 @@ public:
     values_[U8(reg)] = value;
   }
 
-#define DECL_REG_16(Name)                                                                          \
-  U16 Name() {                                                                                     \
+#define DECL_REG_16(Name, FName)                                                                   \
+  U16 FName() {                                                                                    \
     return values_[U8(Register::Name)];                                                            \
   }                                                                                                \
-  void Name(U16 value) {                                                                           \
-    values_[U8(Register::Name)] = value;                                                                                                 \
+  void FName(U16 value) {                                                                          \
+    values_[U8(Register::Name)] = value;                                                           \
   }
 
-  DECL_REG_16(AX)
-  DECL_REG_16(BX)
-  DECL_REG_16(CX)
-  DECL_REG_16(DX)
-  DECL_REG_16(CS)
-  DECL_REG_16(DS)
-  DECL_REG_16(ES)
-  DECL_REG_16(SS)
-  DECL_REG_16(SI)
-  DECL_REG_16(DI)
-  DECL_REG_16(BP)
-  DECL_REG_16(SP)
-  DECL_REG_16(IP)
-  DECL_REG_16(CF)
+  DECL_REG_16(AX, ax)
+  DECL_REG_16(BX, bx)
+  DECL_REG_16(CX, cx)
+  DECL_REG_16(DX, dx)
+  DECL_REG_16(CS, cs)
+  DECL_REG_16(DS, ds)
+  DECL_REG_16(ES, es)
+  DECL_REG_16(SS, ss)
+  DECL_REG_16(SI, si)
+  DECL_REG_16(DI, di)
+  DECL_REG_16(BP, bp)
+  DECL_REG_16(SP, sp)
+  DECL_REG_16(IP, ip)
+  DECL_REG_16(CF, cf)
 
 #undef DECL_REG_16
 
