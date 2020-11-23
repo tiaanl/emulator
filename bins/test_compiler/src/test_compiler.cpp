@@ -1,28 +1,24 @@
-#include <assembler/assembler.h>
-#include <emulator/bus.h>
-#include <emulator/memory.h>
-
-using namespace emulator;
+#include <vm/assembler/assembler.h>
+#include <vm/emulator/bus.h>
+#include <vm/emulator/memory.h>
 
 int main() {
-  auto memory = Memory::create(1024);
+  vm::Memory memory(1024);
 
-  U8* ptr = memory.data;
-  ptr += assembler::emit_mov_reg_from_lit(ptr, Register::AX, 52);
-  ptr += assembler::emit_mov_reg_from_reg(ptr, Register::SP, Register::AX);
-  assembler::emit_halt(ptr);
+  vm::Assembler a(memory.data(), memory.size());
+  a.emit_mov_reg_from_lit(vm::Register::AX, 52);
+  a.emit_mov_reg_from_reg(vm::Register::SP, vm::Register::AX);
+  a.emit_halt();
 
-  auto bus = Bus::create();
-  bus.add_range(0, 1024, &memory_fetch_func, &memory_store_func, &memory);
+  vm::Bus bus;
+  bus.add_range(0x0000, 0x0000, memory.size(), &vm::Memory::load, &vm::Memory::store, &memory);
 
-  auto cpu = CPU::create(&bus);
+  vm::CPU cpu(&bus);
 
   cpu.debug();
-  while (cpu.step() == StepResult::Continue) {
+  while (cpu.step() == vm::StepResult::Continue) {
     cpu.debug();
   }
-
-  memory.destroy();
 
   return 0;
 }

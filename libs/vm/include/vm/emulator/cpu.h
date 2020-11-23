@@ -1,9 +1,9 @@
 #pragma once
 
-#include "emulator/bus.h"
-#include "emulator/registers.h"
+#include "vm/emulator/bus.h"
+#include "vm/emulator/registers.h"
 
-namespace emulator {
+namespace vm {
 
 enum class StepResult : U8 {
   Continue,
@@ -38,4 +38,4 @@ private:
   Registers registers_;
 };
 
-}  // namespace emulator
+}  // namespace vm

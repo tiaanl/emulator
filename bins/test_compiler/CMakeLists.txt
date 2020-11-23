@@ -3,4 +3,4 @@ set(SOURCE_FILES
     )
 
 base_add_executable(test_compiler ${SOURCE_FILES})
-target_link_libraries(test_compiler PRIVATE assembler)
+target_link_libraries(test_compiler PRIVATE vm)

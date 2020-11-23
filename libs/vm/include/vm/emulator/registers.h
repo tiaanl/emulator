@@ -1,6 +1,6 @@
 #pragma once
 
-namespace emulator {
+namespace vm {
 
 // 8086/8088
 //
@@ -84,4 +84,4 @@ private:
 
 const char* register_to_string(Register reg);
 
-}  // namespace emulator
+}  // namespace vm

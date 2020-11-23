@@ -1,4 +1,4 @@
-#include "compiler/parser.h"
+#include "vm/compiler/parser.h"
 
 namespace compiler {
 

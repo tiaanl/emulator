@@ -1,6 +1,6 @@
 #pragma once
 
-namespace emulator {
+namespace vm {
 
 enum OpCode : U8 {
   // MOV AX, SP
@@ -42,4 +42,4 @@ enum OpCode : U8 {
 
 const char* op_code_to_string(U8 op_code);
 
-}  // namespace emulator
+}  // namespace vm

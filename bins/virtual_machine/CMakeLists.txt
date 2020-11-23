@@ -9,7 +9,6 @@ set(SOURCE_FILES
 
 base_add_executable(virtual_machine ${HEADER_FILES} ${SOURCE_FILES})
 target_include_directories(virtual_machine PRIVATE include)
-target_link_libraries(virtual_machine PRIVATE emulator)
-target_link_libraries(virtual_machine PRIVATE assembler)
+target_link_libraries(virtual_machine PRIVATE vm)
 target_link_libraries(virtual_machine PRIVATE glfw)
 target_link_libraries(virtual_machine PRIVATE glad::glad)

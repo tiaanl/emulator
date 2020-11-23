@@ -1,13 +1,15 @@
-#include "emulator/cpu.h"
+#include "vm/emulator/cpu.h"
+
+#include <vm/assembler/disassembler.h>
 
 #include <cassert>
 #include <cstdio>
 
-#include "emulator/op_codes.h"
+#include "vm/emulator/op_codes.h"
 
 #define PRINT_ASSEMBLY 1
 
-namespace emulator {
+namespace vm {
 
 namespace {
 
@@ -26,8 +28,8 @@ StepResult CPU::step() {
   U8 op_code = fetch();
 
 #if PRINT_ASSEMBLY > 0
-   debug();
-   printf("Executing: %s ", op_code_to_string(op_code));
+  debug();
+  printf("Executing: %s ", op_code_to_string(op_code));
 #endif
 
   switch (op_code) {
@@ -176,4 +178,4 @@ void CPU::debug() {
   putchar('\n');
 }
 
-}  // namespace emulator
+}  // namespace vm

@@ -3,4 +3,4 @@ set(SOURCE_FILES
     )
 
 base_add_executable(ec ${SOURCE_FILES})
-target_link_libraries(ec PRIVATE compiler)
+target_link_libraries(ec PRIVATE vm)

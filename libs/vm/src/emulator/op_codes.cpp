@@ -1,9 +1,9 @@
-#include "emulator/op_codes.h"
+#include "vm/emulator/op_codes.h"
 
 #include <cassert>
 #include <cstdio>
 
-namespace emulator {
+namespace vm {
 
 const char* op_code_to_string(U8 op_code) {
   switch (op_code) {
@@ -43,4 +43,4 @@ const char* op_code_to_string(U8 op_code) {
   }
 }
 
-}  // namespace emulator
+}  // namespace vm

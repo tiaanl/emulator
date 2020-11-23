@@ -3,7 +3,7 @@
 #include <cassert>
 #include <memory>
 
-namespace emulator {
+namespace vm {
 
 class Memory {
 public:
@@ -35,4 +35,4 @@ private:
   std::unique_ptr<U8[]> data_;
 };
 
-}  // namespace emulator
+}  // namespace vm

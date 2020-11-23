@@ -1,8 +1,8 @@
-#include "emulator/registers.h"
+#include "vm/emulator/registers.h"
 
 #include <cassert>
 
-namespace emulator {
+namespace vm {
 
 const char* register_to_string(Register reg) {
   switch (reg) {
@@ -53,4 +53,4 @@ const char* register_to_string(Register reg) {
   }
 }
 
-}  // namespace emulator
+}  // namespace vm

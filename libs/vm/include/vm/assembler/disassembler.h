@@ -1,11 +1,11 @@
 #pragma once
 
-#include <emulator/op_codes.h>
-#include <emulator/registers.h>
-
 #include <functional>
 
-namespace assembler {
+#include "vm/emulator/op_codes.h"
+#include "vm/emulator/registers.h"
+
+namespace vm {
 
 class Disassembler {
 public:
@@ -16,8 +16,8 @@ public:
   void disassemble(Emitter&& emitter);
 
 private:
-  emulator::OpCode fetch_op_code();
-  emulator::Register fetch_register();
+  OpCode fetch_op_code();
+  Register fetch_register();
   U8 fetch_u8();
   U16 fetch_u16();
 
@@ -27,4 +27,4 @@ private:
   U8* current_;
 };
 
-}  // namespace assembler
+}  // namespace vm

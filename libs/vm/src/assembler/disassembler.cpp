@@ -1,9 +1,9 @@
-#include "assembler/disassembler.h"
+#include "vm/assembler/disassembler.h"
 
 #include <cassert>
 #include <cstdio>
 
-namespace assembler {
+namespace vm {
 
 namespace {
 
@@ -17,29 +17,29 @@ AddressFrom<T> address_from(T from) {
   return {from};
 }
 
-U16 output(char* data, AddressFrom<emulator::Register> address_from_register) {
-  auto reg = emulator::Register(address_from_register.value);
-  return sprintf(data, "[%s]", emulator::register_to_string(reg));
+U16 output(char* data, AddressFrom<Register> address_from_register) {
+  auto reg = Register(address_from_register.value);
+  return sprintf(data, "[%s]", register_to_string(reg));
 }
 
 U16 output(char* data, AddressFrom<U16> address_from_register) {
   return sprintf(data, "[0x%04x]", address_from_register.value);
 }
 
-U16 output(char* data, emulator::Register reg) {
-  return sprintf(data, "%s", emulator::register_to_string(reg));
+U16 output(char* data, Register reg) {
+  return sprintf(data, "%s", register_to_string(reg));
 }
 
 U16 output(char* data, U16 value) {
   return sprintf(data, "0x%04x", value);
 }
 
-U8 build_line(char* buffer, U16 offset, emulator::OpCode op_code) {
-  return sprintf(buffer, "0x%04x:  %-6s", offset, emulator::op_code_to_string(op_code));
+U8 build_line(char* buffer, U16 offset, OpCode op_code) {
+  return sprintf(buffer, "0x%04x:  %-6s", offset, op_code_to_string(op_code));
 }
 
 template <typename A>
-U8 build_line(char* buffer, U16 offset, emulator::OpCode op_code, A&& a) {
+U8 build_line(char* buffer, U16 offset, OpCode op_code, A&& a) {
   auto o = build_line(buffer, offset, op_code);
   o += output(buffer + o, a);
 
@@ -47,7 +47,7 @@ U8 build_line(char* buffer, U16 offset, emulator::OpCode op_code, A&& a) {
 }
 
 template <typename A, typename B>
-U8 build_line(char* buffer, U16 offset, emulator::OpCode op_code, A&& a, B&& b) {
+U8 build_line(char* buffer, U16 offset, OpCode op_code, A&& a, B&& b) {
   auto o = build_line(buffer, offset, op_code, a);
   o += sprintf(buffer + o, ", ");
   o += output(buffer + o, b);
@@ -72,7 +72,7 @@ void Disassembler::disassemble(Emitter&& emitter) {
     }
 
     switch (op_code) {
-      case emulator::MOV_REG_FROM_REG: {
+      case MOV_REG_FROM_REG: {
         auto to = fetch_register();
         auto from = fetch_register();
         build_line(buffer, offset, op_code, to, from);
@@ -80,7 +80,7 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case emulator::MOV_REG_FROM_LIT: {
+      case MOV_REG_FROM_LIT: {
         auto to = fetch_register();
         auto value = fetch_u16();
         build_line(buffer, offset, op_code, to, value);
@@ -88,7 +88,7 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case emulator::MOV_ADDR_FROM_LIT: {
+      case MOV_ADDR_FROM_LIT: {
         auto addr = fetch_u16();
         auto value = fetch_u16();
         build_line(buffer, offset, op_code, address_from(addr), value);
@@ -96,7 +96,7 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case emulator::MOV_REG_ADDR_FROM_LIT: {
+      case MOV_REG_ADDR_FROM_LIT: {
         auto reg = fetch_register();
         auto value = fetch_u8();
         build_line(buffer, offset, op_code, address_from(reg), value);
@@ -104,7 +104,7 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case emulator::COMPARE_REG_TO_LIT: {
+      case COMPARE_REG_TO_LIT: {
         auto reg = fetch_register();
         auto value = fetch_u16();
         build_line(buffer, offset, op_code, reg, value);
@@ -112,28 +112,28 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case emulator::JUMP_ADDR: {
+      case JUMP_ADDR: {
         auto addr = fetch_u16();
         build_line(buffer, offset, op_code, addr);
         emitter(buffer);
         break;
       }
 
-      case emulator::JUMP_IF_EQUAL: {
+      case JUMP_IF_EQUAL: {
         auto addr = fetch_u16();
         build_line(buffer, offset, op_code, addr);
         emitter(buffer);
         break;
       }
 
-      case emulator::JUMP_IF_NOT_EQUAL: {
+      case JUMP_IF_NOT_EQUAL: {
         auto addr = fetch_u16();
         build_line(buffer, offset, op_code, addr);
         emitter(buffer);
         break;
       }
 
-      case emulator::ADD: {
+      case ADD: {
         auto reg = fetch_register();
         auto value = fetch_u16();
         build_line(buffer, offset, op_code, reg, value);
@@ -141,7 +141,7 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case emulator::SUBTRACT: {
+      case SUBTRACT: {
         auto reg = fetch_register();
         auto value = fetch_u16();
         build_line(buffer, offset, op_code, reg, value);
@@ -149,7 +149,7 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case emulator::MULTIPLY: {
+      case MULTIPLY: {
         auto reg = fetch_register();
         auto value = fetch_u16();
         build_line(buffer, offset, op_code, reg, value);
@@ -157,7 +157,7 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case emulator::HALT: {
+      case HALT: {
         build_line(buffer, offset, op_code);
         emitter(buffer);
         break;
@@ -170,18 +170,18 @@ void Disassembler::disassemble(Emitter&& emitter) {
       }
     }
 
-    if (op_code == emulator::OpCode::HALT) {
+    if (op_code == OpCode::HALT) {
       break;
     }
   }
 }
 
-emulator::OpCode Disassembler::fetch_op_code() {
-  return emulator::OpCode(fetch_u8());
+OpCode Disassembler::fetch_op_code() {
+  return OpCode(fetch_u8());
 }
 
-emulator::Register Disassembler::fetch_register() {
-  return emulator::Register(fetch_u8());
+Register Disassembler::fetch_register() {
+  return Register(fetch_u8());
 }
 
 U8 Disassembler::fetch_u8() {
@@ -194,4 +194,4 @@ U16 Disassembler::fetch_u16() {
   return result;
 }
 
-}  // namespace assembler
+}  // namespace vm
