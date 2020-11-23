@@ -21,8 +21,16 @@ int main() {
     return 1;
   }
 
+  glfwSetErrorCallback([](int code,const char* message) {
+    fprintf(stderr, "ERROR (%d): %s", code, message);
+  });
+
   glfwWindowHint(GLFW_RESIZABLE, 0);
   glfwWindowHint(GLFW_VISIBLE, 0);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   auto window = glfwCreateWindow(g_screen_width * g_screen_zoom, g_screen_height * g_screen_zoom,
                                  "Emulator Virtual Machine", nullptr, nullptr);

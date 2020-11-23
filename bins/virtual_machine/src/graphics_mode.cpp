@@ -80,9 +80,6 @@ bool GraphicsMode::init(I16 screen_width, I16 screen_height) {
 
   glUseProgram(0);
 
-  glGenVertexArrays(1, &vertex_array_object_);
-  glBindVertexArray(vertex_array_object_);
-
   static const F32 vertices[] = {
       -1.0f, -1.0f, 0.0f, 1.0f,  //
       +1.0f, -1.0f, 1.0f, 1.0f,  //
@@ -92,14 +89,17 @@ bool GraphicsMode::init(I16 screen_width, I16 screen_height) {
       -1.0f, -1.0f, 0.0f, 1.0f,  //
   };
 
+  glGenVertexArrays(1, &vertex_array_object_);
+  glBindVertexArray(vertex_array_object_);
+
   GLuint buffer;
   glGenBuffers(1, &buffer);
   glBindBuffer(GL_ARRAY_BUFFER, buffer);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-  glEnableVertexArrayAttrib(vertex_array_object_, 0);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(F32), (void*)0);
-  glEnableVertexArrayAttrib(vertex_array_object_, 1);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(F32), nullptr);
+  glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(F32), (void*)(sizeof(F32) * 2));
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -109,8 +109,8 @@ bool GraphicsMode::init(I16 screen_width, I16 screen_height) {
   glBindTexture(GL_TEXTURE_2D, texture_);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, screen_width, screen_height, 0, GL_RED, GL_UNSIGNED_BYTE,
                color_buffer_);
-  glTextureParameteri(texture_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTextureParameteri(texture_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(texture_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(texture_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glBindTexture(GL_TEXTURE_2D, 0);
 
   return true;
