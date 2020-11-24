@@ -41,6 +41,8 @@ const char* op_code_to_string(U8 op_code) {
       printf("Invalid op_code found: %d\n", op_code);
       assert(0);
   }
+
+  return "";
 }
 
 }  // namespace vm

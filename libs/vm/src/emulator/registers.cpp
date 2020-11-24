@@ -51,6 +51,8 @@ const char* register_to_string(Register reg) {
     default:
       assert(0);
   }
+
+  return "";
 }
 
 }  // namespace vm
