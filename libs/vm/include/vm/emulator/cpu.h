@@ -1,5 +1,6 @@
 #pragma once
 
+#include "op_codes.h"
 #include "vm/emulator/bus.h"
 #include "vm/emulator/registers.h"
 
@@ -20,7 +21,7 @@ public:
 
   inline U8 fetch() {
     auto ip = registers_.ip();
-    auto result = bus_->fetch(registers_.cs(), ip);
+    auto result = bus_->fetch({registers_.cs(), ip});
     registers_.ip(ip + 1);
     return result;
   }
@@ -28,12 +29,16 @@ public:
   inline U16 fetch16() {
     auto cs = registers_.cs();
     auto ip = registers_.ip();
-    U16 result = U16(bus_->fetch(cs, ip)) | U16(bus_->fetch(cs, ip + 1) << 8ul);
+    U16 result = U16(bus_->fetch({cs, ip})) | U16(bus_->fetch({cs, U16(ip + 1)}) << 8ul);
     registers_.ip(ip + 2);
     return result;
   }
 
 private:
+  inline OpCode fetch_op_code() {
+    return OpCode{fetch()};
+  }
+
   Bus* bus_;
   Registers registers_;
 };

@@ -72,7 +72,7 @@ void Disassembler::disassemble(Emitter&& emitter) {
     }
 
     switch (op_code) {
-      case MOV_REG_FROM_REG: {
+      case OpCode::MOV_REG_FROM_REG: {
         auto to = fetch_register();
         auto from = fetch_register();
         build_line(buffer, offset, op_code, to, from);
@@ -80,7 +80,7 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case MOV_REG_FROM_LIT: {
+      case OpCode::MOV_REG_FROM_LIT: {
         auto to = fetch_register();
         auto value = fetch_u16();
         build_line(buffer, offset, op_code, to, value);
@@ -88,7 +88,7 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case MOV_ADDR_FROM_LIT: {
+      case OpCode::MOV_ADDR_FROM_LIT: {
         auto addr = fetch_u16();
         auto value = fetch_u16();
         build_line(buffer, offset, op_code, address_from(addr), value);
@@ -96,7 +96,7 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case MOV_REG_ADDR_FROM_LIT: {
+      case OpCode::MOV_REG_ADDR_FROM_LIT: {
         auto reg = fetch_register();
         auto value = fetch_u8();
         build_line(buffer, offset, op_code, address_from(reg), value);
@@ -104,7 +104,7 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case COMPARE_REG_TO_LIT: {
+      case OpCode::COMPARE_REG_TO_LIT: {
         auto reg = fetch_register();
         auto value = fetch_u16();
         build_line(buffer, offset, op_code, reg, value);
@@ -112,28 +112,28 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case JUMP_ADDR: {
+      case OpCode::JUMP_ADDR: {
         auto addr = fetch_u16();
         build_line(buffer, offset, op_code, addr);
         emitter(buffer);
         break;
       }
 
-      case JUMP_IF_EQUAL: {
+      case OpCode::JUMP_IF_EQUAL: {
         auto addr = fetch_u16();
         build_line(buffer, offset, op_code, addr);
         emitter(buffer);
         break;
       }
 
-      case JUMP_IF_NOT_EQUAL: {
+      case OpCode::JUMP_IF_NOT_EQUAL: {
         auto addr = fetch_u16();
         build_line(buffer, offset, op_code, addr);
         emitter(buffer);
         break;
       }
 
-      case ADD: {
+      case OpCode::ADD: {
         auto reg = fetch_register();
         auto value = fetch_u16();
         build_line(buffer, offset, op_code, reg, value);
@@ -141,7 +141,7 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case SUBTRACT: {
+      case OpCode::SUBTRACT: {
         auto reg = fetch_register();
         auto value = fetch_u16();
         build_line(buffer, offset, op_code, reg, value);
@@ -149,7 +149,7 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case MULTIPLY: {
+      case OpCode::MULTIPLY: {
         auto reg = fetch_register();
         auto value = fetch_u16();
         build_line(buffer, offset, op_code, reg, value);
@@ -157,14 +157,14 @@ void Disassembler::disassemble(Emitter&& emitter) {
         break;
       }
 
-      case HALT: {
+      case OpCode::HALT: {
         build_line(buffer, offset, op_code);
         emitter(buffer);
         break;
       }
 
       default: {
-        printf("Invalid op_code found: %d\n", op_code);
+        printf("Invalid op_code found: %d\n", U8(op_code));
         assert(0);
         break;
       }

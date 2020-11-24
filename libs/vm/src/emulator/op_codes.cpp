@@ -5,7 +5,7 @@
 
 namespace vm {
 
-const char* op_code_to_string(U8 op_code) {
+const char* op_code_to_string(OpCode op_code) {
   switch (op_code) {
     case OpCode::MOV_REG_FROM_REG:
     case OpCode::MOV_REG_FROM_LIT:
@@ -38,7 +38,7 @@ const char* op_code_to_string(U8 op_code) {
       return "HALT";
 
     default:
-      printf("Invalid op_code found: %d\n", op_code);
+      printf("Invalid op_code found: %d\n", U8(op_code));
       assert(0);
   }
 

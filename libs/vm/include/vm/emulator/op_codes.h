@@ -2,7 +2,7 @@
 
 namespace vm {
 
-enum OpCode : U8 {
+enum class OpCode : U8 {
   // MOV AX, SP
   MOV_REG_FROM_REG = 0x01,
 
@@ -40,6 +40,6 @@ enum OpCode : U8 {
   HALT = 0xFF,
 };
 
-const char* op_code_to_string(U8 op_code);
+const char* op_code_to_string(OpCode op_code);
 
 }  // namespace vm

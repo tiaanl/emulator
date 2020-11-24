@@ -25,7 +25,7 @@ enum CompareFlags : U16 {
 }  // namespace
 
 StepResult CPU::step() {
-  U8 op_code = fetch();
+  OpCode op_code = fetch_op_code();
 
 #if PRINT_ASSEMBLY > 0
   debug();
@@ -57,7 +57,7 @@ StepResult CPU::step() {
       auto addr = fetch16();
       auto value = fetch();
       auto ds = registers_.ds();
-      bus_->store(ds, addr, value);
+      bus_->store({ds, addr}, value);
 #if PRINT_ASSEMBLY > 0
       printf("0x%04x, %d\n", addr, value);
 #endif
@@ -68,7 +68,7 @@ StepResult CPU::step() {
       auto reg = Register(fetch());
       auto value = fetch();
       auto ds = registers_.ds();
-      bus_->store(ds, registers_.get(reg), value);
+      bus_->store({ds, registers_.get(reg)}, value);
 #if PRINT_ASSEMBLY > 0
       printf("[%s], %d\n", register_to_string(Register(reg)), value);
 #endif
@@ -84,7 +84,7 @@ StepResult CPU::step() {
       break;
     }
 
-    case JUMP_IF_EQUAL: {
+    case OpCode::JUMP_IF_EQUAL: {
       auto addr = fetch16();
       auto cf = registers_.cf();
       if (cf & CompareFlags::Equal) {
@@ -96,7 +96,7 @@ StepResult CPU::step() {
       break;
     }
 
-    case JUMP_IF_NOT_EQUAL: {
+    case OpCode::JUMP_IF_NOT_EQUAL: {
       auto addr = fetch16();
       auto cf = registers_.cf();
       if (cf & CompareFlags::NotEqual) {

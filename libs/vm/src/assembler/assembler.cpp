@@ -29,7 +29,7 @@ U8 Assembler::emit_mov_reg_from_lit(Register to, U16 value) {
 }
 
 U8 Assembler::emit_mov_addr_from_lit(U16 addr, U8 value) {
-  auto count = emit_op_code(MOV_ADDR_FROM_LIT);
+  auto count = emit_op_code(OpCode::MOV_ADDR_FROM_LIT);
   count += emit_u16(addr);
   count += emit_u8(value);
 
@@ -37,7 +37,7 @@ U8 Assembler::emit_mov_addr_from_lit(U16 addr, U8 value) {
 }
 
 U8 Assembler::emit_mov_reg_addr_from_lit(Register reg, U8 value) {
-  auto count = emit_op_code(MOV_REG_ADDR_FROM_LIT);
+  auto count = emit_op_code(OpCode::MOV_REG_ADDR_FROM_LIT);
   count += emit_u8(U8(reg));
   count += emit_u8(value);
 
@@ -104,7 +104,7 @@ U8 Assembler::emit_halt() {
 }
 
 U8 Assembler::emit_op_code(OpCode op_code) {
-  *current_++ = op_code;
+  *current_++ = U8(op_code);
   return 1;
 }
 

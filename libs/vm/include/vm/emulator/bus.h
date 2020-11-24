@@ -1,5 +1,6 @@
 #pragma once
 
+#include "vm/emulator/address.h"
 #include "vm/object_pool.h"
 
 namespace vm {
@@ -11,11 +12,10 @@ public:
 
   Bus();
 
-  void add_range(U16 segment, U16 offset, U32 size, FetchFunc fetch_func, StoreFunc store_func,
-                 void* obj);
+  void add_range(Address addr, U32 size, FetchFunc fetch_func, StoreFunc store_func, void* obj);
 
-  U8 fetch(U16 segment, U16 offset) const;
-  void store(U16 segment, U16 offset, U8 value) const;
+  U8 fetch(Address addr) const;
+  void store(Address addr, U8 value) const;
 
 private:
   struct BusNode {

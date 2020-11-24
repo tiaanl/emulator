@@ -49,8 +49,8 @@ int main() {
 
   vm::Memory memory(1024);
   vm::Bus bus;
-  bus.add_range(0x0000, 0x0000, memory.size(), vm::Memory::load, vm::Memory::store, &memory);
-  bus.add_range(0xA000, 0x0000, U32(g_screen_width * g_screen_height),
+  bus.add_range({0x0000, 0x0000}, memory.size(), vm::Memory::load, vm::Memory::store, &memory);
+  bus.add_range({0xA000, 0x0000}, U32(g_screen_width * g_screen_height),
                 GraphicsMode::graphics_mode_fetch_func, GraphicsMode::graphics_mode_store_func,
                 &graphics_mode);
   vm::CPU cpu(&bus);
