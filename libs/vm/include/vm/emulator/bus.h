@@ -7,8 +7,8 @@ namespace vm {
 
 class Bus {
 public:
-  using FetchFunc = U8 (*)(void*, U16);
-  using StoreFunc = void (*)(void*, U16, U8);
+  using FetchFunc = U8 (*)(void*, U32 Address);
+  using StoreFunc = void (*)(void*, U32 Address, U8);
 
   Bus();
 

@@ -7,7 +7,7 @@ namespace vm {
 
 class Assembler {
 public:
-  Assembler(U8* data, U16 data_size);
+  Assembler();
 
   U16 label() const;
 
@@ -30,10 +30,7 @@ private:
   U8 emit_u8(U8 value);
   U8 emit_u16(U16 value);
 
-  U8* data_;
-  U16 data_size_;
-
-  U8* current_;
+  std::vector<U8> data_;
 };
 
 }  // namespace vm

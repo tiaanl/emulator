@@ -5,11 +5,10 @@
 
 namespace vm {
 
-Assembler::Assembler(U8* data, U16 data_size)
-  : data_(data), data_size_(data_size), current_(data) {}
+Assembler::Assembler() = default;
 
 U16 Assembler::label() const {
-  return U16(current_ - data_);
+  return U16(data_.size());
 }
 
 U8 Assembler::emit_mov_reg_from_reg(Register to, Register from) {
@@ -104,23 +103,21 @@ U8 Assembler::emit_halt() {
 }
 
 U8 Assembler::emit_op_code(OpCode op_code) {
-  *current_++ = U8(op_code);
-  return 1;
+  return emit_u8(U8(op_code));
 }
 
 U8 Assembler::emit_register(Register reg) {
-  *current_++ = U8(reg);
-  return 1;
+  return emit_u8(U8(reg));
 }
 
 U8 Assembler::emit_u8(U8 value) {
-  *current_++ = value;
-  return 2;
+  data_.push_back(value);
+  return 1;
 }
 
 U8 Assembler::emit_u16(U16 value) {
-  *current_++ = U8(value & 0xFFu);
-  *current_++ = U8(value >> 0x08u);
+  data_.push_back(U8(value & 0xFFu));
+  data_.push_back(U8(value >> 0x08u));
   return 2;
 }
 

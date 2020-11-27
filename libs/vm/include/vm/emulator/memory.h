@@ -2,37 +2,44 @@
 
 #include <cassert>
 #include <memory>
+#include <vector>
+
+#include "bus.h"
+#include "vm/emulator/address.h"
 
 namespace vm {
 
 class Memory {
 public:
-  explicit Memory(U16 size);
+  Memory();
   ~Memory();
 
-  U16 size() const {
-    return size_;
-  }
+  Address allocate_page();
 
-  U8* data() const {
-    return data_.get();
-  }
-
-  static U8 load(void* obj, U16 addr) {
+  static U8 load(void* obj, U32 flat) {
     auto memory = (Memory*)obj;
-    assert(addr < memory->size_);
-    return memory->data_[addr];
+    auto page_num = flat / 0xFFFF;
+    assert(page_num < memory->pages_.size());
+    return memory->pages_[page_num].data[flat % 0xFFFF];
   }
 
-  static void store(void* obj, U16 addr, U8 value) {
+  static void store(void* obj, U32 flat, U8 value) {
     auto memory = (Memory*)obj;
-    assert(addr < memory->size_);
-    memory->data_[addr] = value;
+    auto page_num = flat / 0xFFFF;
+    assert(page_num < memory->pages_.size());
+    memory->pages_[page_num].data[flat % 0xFFFF] = value;
   }
 
 private:
-  U16 size_;
-  std::unique_ptr<U8[]> data_;
+  struct Page {
+    U8 data[0xFFF];
+  };
+
+  std::vector<Page> pages_;
 };
+
+inline void map_memory_page_to_bus(Bus* bus, Memory* memory, Address addr) {
+  bus->add_range(addr, 0xFFFF, Memory::load, Memory::store, memory);
+}
 
 }  // namespace vm

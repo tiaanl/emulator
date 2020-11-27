@@ -47,15 +47,17 @@ int main() {
   GraphicsMode graphics_mode;
   graphics_mode.init(g_screen_width, g_screen_height);
 
-  vm::Memory memory(1024);
+  vm::Memory memory;
+  auto page_addr = memory.allocate_page();
+
   vm::Bus bus;
-  bus.add_range({0x0000, 0x0000}, memory.size(), vm::Memory::load, vm::Memory::store, &memory);
+  map_memory_page_to_bus(&bus, &memory, page_addr);
   bus.add_range({0xA000, 0x0000}, U32(g_screen_width * g_screen_height),
                 GraphicsMode::graphics_mode_fetch_func, GraphicsMode::graphics_mode_store_func,
                 &graphics_mode);
   vm::CPU cpu(&bus);
 
-  vm::Assembler a(memory.data(), memory.size());
+  vm::Assembler a;
 
   auto count = 0;
   count += a.emit_mov_reg_from_lit(vm::Register::DS, 0xA000);
@@ -72,8 +74,8 @@ int main() {
 
   printf("Wrote %d bytes of instructions\n", count);
 
-  vm::Disassembler d(memory.data(), memory.size());
-  d.disassemble([](const char* line) { printf("%s\n", line); });
+//  vm::Disassembler d(memory.data(), memory.size());
+//  d.disassemble([](const char* line) { printf("%s\n", line); });
 
   glfwShowWindow(window);
 

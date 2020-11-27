@@ -17,13 +17,13 @@ public:
   void clear_screen(U8 color);
   void set_pixel(I16 x, I16 y, U8 color);
 
-  static U8 graphics_mode_fetch_func(void*, U16) {
+  static U8 graphics_mode_fetch_func(void*, U32) {
     return 0;
   }
 
-  static void graphics_mode_store_func(void* data, U16 addr, U8 value) {
+  static void graphics_mode_store_func(void* data, U32 addr, U8 value) {
     auto* graphics_mode = (GraphicsMode*)data;
-    assert(addr < graphics_mode->screen_width_ * graphics_mode->screen_height_);
+    assert(addr < U32(graphics_mode->screen_width_ * graphics_mode->screen_height_));
     graphics_mode->color_buffer_[addr] = value;
   }
 
