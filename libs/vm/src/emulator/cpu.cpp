@@ -163,7 +163,7 @@ StepResult CPU::step() {
       return StepResult::Halt;
 
     default: {
-      printf("Invalid op_code: %d\n", op_code);
+      printf("Invalid op_code: %d\n", U8(op_code));
       assert(0);
     }
   }

@@ -13,6 +13,7 @@ public:
   Bus();
 
   void add_range(Address addr, U32 size, FetchFunc fetch_func, StoreFunc store_func, void* obj);
+  void copy_range(Address start, U32 size, const U8* source) const;
 
   U8 fetch(Address addr) const;
   void store(Address addr, U8 value) const;

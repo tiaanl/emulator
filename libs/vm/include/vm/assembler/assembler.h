@@ -9,6 +9,8 @@ class Assembler {
 public:
   Assembler();
 
+  void copy_to_bus(Bus* bus, Address addr);
+
   U16 label() const;
 
   U8 emit_mov_reg_from_reg(Register to, Register from);

@@ -13,6 +13,12 @@ void Bus::add_range(Address addr, U32 size, FetchFunc fetch_func, StoreFunc stor
   first_node_ = new_node;
 }
 
+void Bus::copy_range(Address start, U32 size, const U8* source) const {
+  for (U32 i = 0; i < size; ++i) {
+    store(start + i, source[i]);
+  }
+}
+
 U8 Bus::fetch(Address addr) const {
   auto flat = addr.flat();
   for (auto current = first_node_; current; current = current->next) {

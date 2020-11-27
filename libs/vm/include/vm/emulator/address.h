@@ -4,23 +4,43 @@ namespace vm {
 
 class Address {
 public:
-  Address(U16 segment, U16 offset) : segment_(segment), offset_(offset) {}
+  Address() : address_(0) {}
 
-  inline U16 segment() const {
-    return segment_;
+  explicit Address(U32 address) : address_(address) {}
+
+  Address(U16 segment, U16 offset) : address_((segment << 0x08u) + offset) {}
+
+  bool operator==(const Address& right) const {
+    return address_ == right.address_;
   }
 
-  inline U16 offset() const {
-    return offset_;
+  bool operator!=(const Address& right) const {
+    return !operator==(right);
   }
 
-  inline U32 flat() const {
-    return (segment_ << 4u) + offset_;
+  Address& operator+=(U32 right) {
+    address_ += right;
+    return *this;
+  }
+
+  friend Address operator+(Address left, U32 right) {
+    return Address(left.address_ + right);
+  }
+
+  U16 segment() const {
+    return (address_ & 0xFFFF0000u) >> 0x08u;
+  }
+
+  U16 offset() const {
+    return address_ & 0xFFFFu;
+  }
+
+  U32 flat() const {
+    return address_;
   }
 
 private:
-  U16 segment_;
-  U16 offset_;
+  U32 address_;
 };
 
 }  // namespace vm

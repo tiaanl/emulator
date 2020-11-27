@@ -72,6 +72,8 @@ int main() {
   count += a.emit_jump_if_not_equal(label_loop);
   count += a.emit_halt();
 
+  a.copy_to_bus(&bus, {0, 0});
+
   printf("Wrote %d bytes of instructions\n", count);
 
 //  vm::Disassembler d(memory.data(), memory.size());

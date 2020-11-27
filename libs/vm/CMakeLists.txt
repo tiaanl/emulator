@@ -26,3 +26,13 @@ set(SOURCE_FILES
 
 base_add_library(vm ${HEADER_FILES} ${SOURCE_FILES})
 target_precompile_headers(vm PUBLIC include/vm/platform.h)
+
+set (TEST_FILES
+    tests/emulator/address_tests.cpp
+    tests/emulator/cpu_tests.cpp
+    tests/vm_tests.cpp
+    )
+
+base_add_executable(vm_tests ${TEST_FILES})
+target_link_libraries(vm_tests PRIVATE vm)
+target_link_libraries(vm_tests PRIVATE Catch2::Catch2)
