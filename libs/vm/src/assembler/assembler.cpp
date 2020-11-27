@@ -7,10 +7,6 @@ namespace vm {
 
 Assembler::Assembler() = default;
 
-void Assembler::copy_to_bus(Bus* bus, Address addr) {
-  bus->copy_range(addr, data_.size(), data_.data());
-}
-
 U16 Assembler::label() const {
   return U16(data_.size());
 }

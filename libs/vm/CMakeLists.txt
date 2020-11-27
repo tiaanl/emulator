@@ -5,6 +5,7 @@ set(HEADER_FILES
     include/vm/compiler/parser.h
     include/vm/emulator/bus.h
     include/vm/emulator/cpu.h
+    include/vm/emulator/emulator.h
     include/vm/emulator/memory.h
     include/vm/emulator/op_codes.h
     include/vm/emulator/registers.h
@@ -19,6 +20,7 @@ set(SOURCE_FILES
     src/compiler/parser.cpp
     src/emulator/bus.cpp
     src/emulator/cpu.cpp
+    src/emulator/emulator.cpp
     src/emulator/memory.cpp
     src/emulator/op_codes.cpp
     src/emulator/registers.cpp

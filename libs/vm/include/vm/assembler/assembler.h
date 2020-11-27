@@ -9,7 +9,13 @@ class Assembler {
 public:
   Assembler();
 
-  void copy_to_bus(Bus* bus, Address addr);
+  const U8* code() const {
+    return data_.data();
+  }
+
+  U16 size() const {
+    return data_.size();
+  }
 
   U16 label() const;
 
