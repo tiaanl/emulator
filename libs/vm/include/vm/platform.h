@@ -27,4 +27,10 @@ using F64 = double;
 static_assert(sizeof(F32) == 4);
 static_assert(sizeof(F64) == 8);
 
+using MemSize = U64;
+using MemDiff = I64;
+
+static_assert(sizeof(MemSize) == 8);
+static_assert(sizeof(MemDiff) == 8);
+
 #endif  // PLATFORM_H_
