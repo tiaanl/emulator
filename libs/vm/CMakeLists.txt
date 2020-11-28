@@ -1,8 +1,6 @@
 set(HEADER_FILES
     include/vm/assembler/assembler.h
     include/vm/assembler/disassembler.h
-    include/vm/compiler/compiler.h
-    include/vm/compiler/parser.h
     include/vm/emulator/bus.h
     include/vm/emulator/cpu.h
     include/vm/emulator/emulator.h
@@ -16,8 +14,6 @@ set(HEADER_FILES
 set(SOURCE_FILES
     src/assembler/assembler.cpp
     src/assembler/disassembler.cpp
-    src/compiler/compiler.cpp
-    src/compiler/parser.cpp
     src/emulator/bus.cpp
     src/emulator/cpu.cpp
     src/emulator/emulator.cpp
