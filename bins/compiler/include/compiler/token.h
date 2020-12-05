@@ -1,34 +1,13 @@
 #pragma once
 
-enum class TokenType : U8 {
-  EndOfSource,
-
-  // Whitespace
-  Whitespace,
-  NewLine,
-
-  // Punctuation
-  Comma,               // ,
-  OpenSquareBracket,   // [
-  CloseSquareBracket,  // ]
-  Colon,               // :
-  Plus,                // +
-  Minus,               // -
-
-  // Literals
-  Identifier,
-  Number,
-
-  Unknown,
-};
+#include "compiler/range.h"
+#include "compiler/token_type.h"
 
 struct Token {
   TokenType type;
-  MemSize start;
-  MemSize length;
+  Range<char> data;
 
-  Token(TokenType type, MemSize start, MemSize length = 0)
-    : type(type), start(start), length(length) {}
+  Token(TokenType type, Range<char> data) : type(type), data(data) {}
 };
 
 const char* token_type_to_string(TokenType token_type);

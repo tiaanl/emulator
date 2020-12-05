@@ -1,8 +1,10 @@
-#include <cassert>
 #include <cstdio>
-#include <vector>
 
 #include "compiler/lexer.h"
+
+void print_token(const Token& token) {
+  printf("Token: %s (%llu)\n", token_type_to_string(token.type), token.data.length());
+}
 
 int main() {
   auto source = R"(
@@ -12,16 +14,16 @@ int main() {
     MOV  AX, [BP+6-2]
   )";
 
-  std::vector<Token> tokens;
-  Lexer lexer(source);
+  Lexer lexer(range_from(source));
 
-  for (Token token = lexer.consume_token(); token.type != TokenType::EndOfSource;
-       token = lexer.consume_token()) {
-    assert(token.type != TokenType::Unknown);
-    if (token.type == TokenType::Whitespace) {
-      continue;
+  for (;;) {
+    auto token = lexer.consume_token();
+
+    print_token(token);
+
+    if (token.type == TokenType::EndOfSource || token.type == TokenType::Unknown) {
+      break;
     }
-    printf("Token: %s (%llu, %llu)\n", token_type_to_string(token.type), token.start, token.length);
   }
 
   return 0;

@@ -1,6 +1,9 @@
 set(HEADER_FILES
     include/compiler/lexer.h
+    include/compiler/range.h
     include/compiler/token.h
+    include/compiler/token_iterator.h
+    include/compiler/token_type.h
     )
 
 set(SOURCE_FILES

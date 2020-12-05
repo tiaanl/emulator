@@ -5,31 +5,31 @@
 
 namespace {
 
-bool is_whitespace(I8 ch) {
+inline bool is_whitespace(char ch) {
   return (ch == ' ') || (ch == '\t');
 }
 
-bool is_new_line(I8 ch) {
+inline bool is_new_line(char ch) {
   return (ch == '\n') || (ch == '\r');
 }
 
-bool is_alpha(I8 ch) {
-  return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+inline bool is_alpha(char ch) {
+  return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch == '_');
 }
 
-bool is_numeric(I8 ch) {
+inline bool is_numeric(char ch) {
   return (ch >= '0' && ch <= '9');
 }
 
-bool is_alpha_numeric(I8 ch) {
+inline bool is_alpha_numeric(char ch) {
   return is_alpha(ch) || is_numeric(ch);
 }
 
-bool is_numeric_extra(I8 ch) {
+inline bool is_numeric_extra(char ch) {
   return is_numeric(ch) || ch == '.' || ch == 'X' || ch == 'x' || ch == 'b' || ch == 'B';
 }
 
-bool is_punctuation(I8 ch) {
+inline bool is_punctuation(char ch) {
   static const char* punctuation = ",[]:+-";
   for (const char* p = punctuation; *p; ++p) {
     if (ch == *p) {
@@ -39,112 +39,59 @@ bool is_punctuation(I8 ch) {
   return false;
 }
 
+#define PEEK_CONTINUOUS(Predicate)                                                                 \
+  [](auto source) {                                                                                \
+    return find_if_not(source, (Predicate));                                                       \
+  }
+
+#define PEEK_PUNCTUATION(Char)                                                                     \
+  [](auto range) {                                                                                 \
+    if (*range.begin() == (Char)) {                                                                \
+      return range.front(1);                                                                       \
+    }                                                                                              \
+    return range.front(0);                                                                         \
+  }
+
+using TokenTypeFunc = Range<char> (*)(Range<char>);
+
+struct {
+  TokenType type;
+  TokenTypeFunc func;
+} kTokenEntries[] = {
+    {TokenType::Comma, PEEK_PUNCTUATION(',')},
+    {TokenType::OpenSquareBracket, PEEK_PUNCTUATION('[')},
+    {TokenType::CloseSquareBracket, PEEK_PUNCTUATION(']')},
+    {TokenType::Colon, PEEK_PUNCTUATION(':')},
+    {TokenType::Plus, PEEK_PUNCTUATION('+')},
+    {TokenType::Minus, PEEK_PUNCTUATION('-')},
+    {TokenType::NewLine, PEEK_CONTINUOUS(is_new_line)},
+    {TokenType::Whitespace, PEEK_CONTINUOUS(is_whitespace)},
+    {TokenType::Identifier, PEEK_CONTINUOUS(is_alpha)},
+    {TokenType::Number, PEEK_CONTINUOUS(is_numeric)},
+};
+
 }  // namespace
 
-Lexer::Lexer(std::string_view source)
-  : source_(source.data()), source_length_(source.size()), current_pos_(0) {}
+Lexer::Lexer(Range<char> source) : source_(source), current_(source) {}
+
+Token Lexer::peek_token() {
+  if (current_.empty()) {
+    return {TokenType::EndOfSource, current_};
+  }
+
+  for (auto& token_entry : kTokenEntries) {
+    auto found = token_entry.func(current_);
+    if (!found.empty()) {
+      return {token_entry.type, found};
+    }
+  }
+
+  Token result{TokenType::Unknown, current_.front(1)};
+  return result;
+}
 
 Token Lexer::consume_token() {
-  if (current_pos_ >= source_length_) {
-    return {TokenType::EndOfSource, current_pos_};
-  }
-
-  I8 ch = source_[current_pos_];
-
-  if (is_whitespace(ch)) {
-    return consume_whitespace();
-  }
-
-  if (is_new_line(ch)) {
-    return consume_new_line();
-  }
-
-  if (is_alpha(ch)) {
-    return consume_identifier();
-  }
-
-  if (is_numeric(ch)) {
-    return consume_number();
-  }
-
-  if (is_punctuation(ch)) {
-    return consume_punctuation();
-  }
-
-  return {TokenType::Unknown, current_pos_++, 1};
-}
-
-Token Lexer::consume_whitespace() {
-  Token result(TokenType::Whitespace, current_pos_);
-
-  while (current_pos_ < source_length_ && is_whitespace(source_[current_pos_])) {
-    ++current_pos_;
-  }
-
-  result.length = current_pos_ - result.start;
-
-  return result;
-}
-
-Token Lexer::consume_new_line() {
-  Token result(TokenType::NewLine, current_pos_);
-
-  while (current_pos_ < source_length_ && is_new_line(source_[current_pos_])) {
-    ++current_pos_;
-  }
-
-  result.length = current_pos_ - result.start;
-
-  return result;
-}
-
-Token Lexer::consume_punctuation() {
-  MemSize start = current_pos_++;
-  I8 ch = source_[start];
-
-  switch (ch) {
-    case ',':
-      return {TokenType::Comma, start, 1};
-
-    case '[':
-      return {TokenType::OpenSquareBracket, start, 1};
-
-    case ']':
-      return {TokenType::CloseSquareBracket, start, 1};
-
-    case ':':
-      return {TokenType::Colon, start, 1};
-
-    case '+':
-      return {TokenType::Plus, start, 1};
-
-    case '-':
-      return {TokenType::Minus, start, 1};
-
-    default:
-      assert(0);
-      return {TokenType::Unknown, start, 1};
-  }
-}
-
-Token Lexer::consume_identifier() {
-  Token result(TokenType::Identifier, current_pos_);
-
-  while (current_pos_ < source_length_ && is_alpha_numeric(source_[current_pos_])) {
-    ++current_pos_;
-  }
-
-  result.length = current_pos_ - result.start;
-  return result;
-}
-
-Token Lexer::consume_number() {
-  Token result(TokenType::Number, current_pos_);
-
-  while (current_pos_ < source_length_ && is_numeric_extra(source_[current_pos_])) {
-    ++current_pos_;
-  }
-
-  result.length = current_pos_ - result.start;
-  return result;
+  auto token = peek_token();
+  current_ = current_.middle(token.data.length());
+  return token;
 }
