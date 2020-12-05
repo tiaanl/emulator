@@ -11,103 +11,112 @@ U16 Assembler::label() const {
   return U16(data_.size());
 }
 
-U8 Assembler::emit_mov_reg_from_reg(Register to, Register from) {
-  auto count = emit_op_code(OpCode::MOV_REG_FROM_REG);
-  count += emit_register(to);
-  count += emit_register(from);
-
-  return count;
+U8 Assembler::emit_mov_reg_from_reg(Register destination, Register source) {
+  return emit_instruction(
+      {InstructionType::Move, operand_register(destination), operand_register(source)});
 }
 
-U8 Assembler::emit_mov_reg_from_lit(Register to, U16 value) {
-  auto count = emit_op_code(OpCode::MOV_REG_FROM_LIT);
-  count += emit_register(to);
-  count += emit_u16(value);
-
-  return count;
+U8 Assembler::emit_mov_reg_from_lit(Register destination, U16 value) {
+  return emit_instruction({
+      InstructionType::Move,
+      operand_register(destination),
+      operand_immediate(value),
+  });
 }
 
 U8 Assembler::emit_mov_addr_from_lit(U16 addr, U8 value) {
-  auto count = emit_op_code(OpCode::MOV_ADDR_FROM_LIT);
-  count += emit_u16(addr);
-  count += emit_u8(value);
-
-  return count;
+  return emit_instruction({
+      InstructionType::Move,
+      operand_direct(addr),
+      operand_immediate(value),
+  });
 }
 
 U8 Assembler::emit_mov_reg_addr_from_lit(Register reg, U8 value) {
-  auto count = emit_op_code(OpCode::MOV_REG_ADDR_FROM_LIT);
-  count += emit_u8(U8(reg));
-  count += emit_u8(value);
-
-  return count;
+  return emit_instruction({
+      InstructionType::Move,
+      operand_indirect(reg),
+      operand_immediate(value),
+  });
 }
 
-U8 Assembler::emit_jump_addr(U16 addr) {
-  auto count = emit_op_code(OpCode::JUMP_ADDR);
-  count += emit_u16(addr);
+U8 Assembler::emit_compare_reg_to_lit(Register left, U16 right) {
+  return emit_instruction({
+      InstructionType::Compare,
+      operand_register(left),
+      operand_immediate(right),
+  });
+}
 
-  return count;
+U8 Assembler::emit_jump_unconditional(U16 addr) {
+  return emit_instruction({
+      InstructionType::Jump,
+      {U8(JumpCondition::Unconditional), addr},
+      {},
+  });
 }
 
 U8 Assembler::emit_jump_if_equal(U16 addr) {
-  auto count = emit_op_code(OpCode::JUMP_IF_EQUAL);
-  count += emit_u16(addr);
-
-  return count;
+  return emit_instruction({
+      InstructionType::Jump,
+      {U8(JumpCondition::IfEqual), addr},
+      {},
+  });
 }
 
 U8 Assembler::emit_jump_if_not_equal(U16 addr) {
-  auto count = emit_op_code(OpCode::JUMP_IF_NOT_EQUAL);
-  count += emit_u16(addr);
-
-  return count;
+  return emit_instruction({
+      InstructionType::Jump,
+      {U8(JumpCondition::IfNotEqual), addr},
+      {},
+  });
 }
 
-U8 Assembler::emit_add(Register reg, U16 value) {
-  auto count = emit_op_code(OpCode::ADD);
-  count += emit_register(reg);
-  count += emit_u16(value);
-
-  return count;
+U8 Assembler::emit_add(Register destination, U16 source) {
+  return emit_instruction({
+      InstructionType::Add,
+      operand_register(destination),
+      operand_immediate(source),
+  });
 }
 
-U8 Assembler::emit_subtract(Register reg, U16 value) {
-  auto count = emit_op_code(OpCode::SUBTRACT);
-  count += emit_register(reg);
-  count += emit_u16(value);
-
-  return count;
+U8 Assembler::emit_subtract(Register destination, U16 source) {
+  return emit_instruction({
+      InstructionType::Subtract,
+      operand_register(destination),
+      operand_immediate(source),
+  });
 }
 
-U8 Assembler::emit_multiply(Register reg, U16 value) {
-  auto count = emit_op_code(OpCode::MULTIPLY);
-  count += emit_register(reg);
-  count += emit_u16(value);
-
-  return count;
-}
-
-U8 Assembler::emit_compare_reg_to_lit(Register reg, U16 value) {
-  auto count = emit_op_code(OpCode::COMPARE_REG_TO_LIT);
-  count += emit_register(reg);
-  count += emit_u16(value);
-
-  return count;
+U8 Assembler::emit_multiply(Register destination, U16 source) {
+  return emit_instruction({
+      InstructionType::Multiply,
+      operand_register(destination),
+      operand_immediate(source),
+  });
 }
 
 U8 Assembler::emit_halt() {
-  auto count = emit_op_code(OpCode::HALT);
+  return emit_instruction({
+      InstructionType::Halt,
+      {},
+      {},
+  });
+}
 
+U8 Assembler::emit_instruction(const Instruction& instruction) {
+  U8 count = 0;
+  count += emit_u8(U8(instruction.type));
+  count += emit_operand(instruction.destination);
+  count += emit_operand(instruction.source);
   return count;
 }
 
-U8 Assembler::emit_op_code(OpCode op_code) {
-  return emit_u8(U8(op_code));
-}
-
-U8 Assembler::emit_register(Register reg) {
-  return emit_u8(U8(reg));
+U8 Assembler::emit_operand(const Operand& operand) {
+  U8 count = 0;
+  count += emit_u8(operand.meta);
+  count += emit_u16(operand.value);
+  return count;
 }
 
 U8 Assembler::emit_u8(U8 value) {

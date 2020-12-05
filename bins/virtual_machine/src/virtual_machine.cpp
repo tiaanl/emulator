@@ -20,8 +20,9 @@ int main() {
     return 1;
   }
 
-  glfwSetErrorCallback(
-      [](int code, const char* message) { fprintf(stderr, "ERROR (%d): %s", code, message); });
+  glfwSetErrorCallback([](int code, const char* message) {
+    fprintf(stderr, "ERROR (%d): %s", code, message);
+  });
 
   glfwWindowHint(GLFW_RESIZABLE, 0);
   glfwWindowHint(GLFW_VISIBLE, 0);
@@ -51,6 +52,14 @@ int main() {
   vm::Emulator emulator;
 
   vm::Assembler a;
+  auto start = a.label();
+  a.emit_mov_reg_from_lit(vm::Register::R1, 72);
+  a.emit_mov_reg_from_reg(vm::Register::R2, vm::Register::R1);
+  a.emit_compare_reg_to_lit(vm::Register::R2, 7);
+  a.emit_jump_if_equal(start);
+  a.emit_add(vm::Register::R2, 9);
+  a.emit_subtract(vm::Register::R2, 2);
+  a.emit_multiply(vm::Register::R2, 4);
   a.emit_halt();
 
   emulator.upload_code(a.code(), a.size());

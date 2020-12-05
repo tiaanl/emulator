@@ -1,11 +1,7 @@
 #include "vm/emulator/cpu.h"
 
-#include <vm/assembler/disassembler.h>
-
 #include <cassert>
 #include <cstdio>
-
-#include "vm/emulator/op_codes.h"
 
 #define PRINT_ASSEMBLY 1
 
@@ -22,147 +18,183 @@ enum CompareFlags : U16 {
   GreaterThanOrEqual = 0x0040,
 };
 
+void print_operand(const Operand& operand) {
+  switch (AddressingMode(operand.meta)) {
+    case AddressingMode::Immediate:
+      printf("0x%04x", operand.value);
+      break;
+
+    case AddressingMode::Register:
+      printf("%s", register_to_string(Register(operand.value)));
+      break;
+
+    case AddressingMode::Direct:
+      printf("[0x%04x]", operand.value);
+      break;
+
+    case AddressingMode::Indirect:
+      printf("[%s]", register_to_string(Register(operand.value)));
+      break;
+  }
+}
+
+void print_instruction(const Instruction& instruction) {
+  switch (instruction.type) {
+    case InstructionType::Move: {
+      printf("MOV ");
+      print_operand(instruction.destination);
+      printf(", ");
+      print_operand(instruction.source);
+      putchar('\n');
+      break;
+    }
+
+    case InstructionType::Compare: {
+      printf("CMP ");
+      print_operand(instruction.destination);
+      printf(", ");
+      print_operand(instruction.source);
+      printf("\n");
+      break;
+    }
+
+    case InstructionType::Jump: {
+      auto jc = JumpCondition(instruction.destination.meta);
+      switch (jc) {
+        case JumpCondition::Unconditional:
+          printf("JMP ");
+          break;
+
+        case JumpCondition::IfEqual:
+          printf("JEQ ");
+          break;
+
+        case JumpCondition::IfNotEqual:
+          printf("JNE ");
+          break;
+      }
+      printf("0x%04x", instruction.destination.value);
+      printf("\n");
+      break;
+    }
+
+    case InstructionType::Add: {
+      printf("ADD ");
+      print_operand(instruction.destination);
+      printf(", ");
+      print_operand(instruction.source);
+      printf("\n");
+      break;
+    }
+
+    case InstructionType::Subtract: {
+      printf("SUB ");
+      print_operand(instruction.destination);
+      printf(", ");
+      print_operand(instruction.source);
+      printf("\n");
+      break;
+    }
+
+    case InstructionType::Multiply: {
+      printf("MUL ");
+      print_operand(instruction.destination);
+      printf(", ");
+      print_operand(instruction.source);
+      printf("\n");
+      break;
+    }
+
+    case InstructionType::Halt:
+      puts("HALT");
+      break;
+  }
+}
+
 }  // namespace
 
 StepResult CPU::step() {
-  OpCode op_code = fetch_op_code();
+  Instruction instruction;
+  decode(&instruction);
 
-#if PRINT_ASSEMBLY > 0
-  debug();
-  printf("Executing: %s ", op_code_to_string(op_code));
+#if PRINT_ASSEMBLY >= 0
+  print_instruction(instruction);
 #endif
 
-  switch (op_code) {
-    case OpCode::MOV_REG_FROM_REG: {
-      auto to = Register(fetch());
-      auto from = Register(fetch());
-      registers_.set(to, registers_.get(from));
-#if PRINT_ASSEMBLY > 0
-      printf("%s, %s\n", register_to_string(to), register_to_string(from));
-#endif
+  switch (instruction.type) {
+    case InstructionType::Move: {
+      store_value(instruction.destination, fetch_value(instruction.source));
       break;
     }
 
-    case OpCode::MOV_REG_FROM_LIT: {
-      auto to = Register(fetch());
-      auto value = fetch16();
-      registers_.set(to, value);
-#if PRINT_ASSEMBLY > 0
-      printf("%s, 0x%04x\n", register_to_string(to), value);
-#endif
+    case InstructionType::Compare: {
+      U16 left = fetch_value(instruction.destination);
+      U16 right = fetch_value(instruction.source);
+
+      U16 flags = 0x0000u;
+      if (left == right) flags |= CompareFlags::Equal;
+      if (left != right) flags |= CompareFlags::NotEqual;
+      if (left < right) flags |= CompareFlags::LessThan;
+      if (left <= right) flags |= CompareFlags::LessThanOrEqual;
+      if (left > right) flags |= CompareFlags::GreaterThan;
+      if (left >= right) flags |= CompareFlags::GreaterThanOrEqual;
+
+      registers_.set(Register::FL, flags);
+
       break;
     }
 
-    case OpCode::MOV_ADDR_FROM_LIT: {
-      auto addr = fetch16();
-      auto value = fetch();
-      memory_->store(addr, value);
-#if PRINT_ASSEMBLY > 0
-      printf("0x%04x, %d\n", addr, value);
-#endif
-      break;
-    }
+    case InstructionType::Jump: {
+      U16 value = fetch_value(instruction.destination);
+      switch (JumpCondition(instruction.destination.meta)) {
+        case JumpCondition::Unconditional: {
+          registers_.set(Register::IP, value);
+          break;
+        }
 
-    case OpCode::MOV_REG_ADDR_FROM_LIT: {
-      auto reg = Register(fetch());
-      auto value = fetch();
-      memory_->store(registers_.get(reg), value);
-#if PRINT_ASSEMBLY > 0
-      printf("[%s], %d\n", register_to_string(Register(reg)), value);
-#endif
-      break;
-    }
+        case JumpCondition::IfEqual: {
+          if (registers_.get(Register::FL) & CompareFlags::Equal) {
+            registers_.set(Register::IP, value);
+          }
+          break;
+        }
 
-    case OpCode::JUMP_ADDR: {
-      auto addr = fetch16();
-      registers_.ip(addr);
-#if PRINT_ASSEMBLY > 0
-      printf("0x%04x\n", addr);
-#endif
-      break;
-    }
-
-    case OpCode::JUMP_IF_EQUAL: {
-      auto addr = fetch16();
-      auto flags = registers_.flags();
-      if (flags & CompareFlags::Equal) {
-        registers_.ip(addr);
+        case JumpCondition::IfNotEqual: {
+          if (registers_.get(Register::FL) & CompareFlags::NotEqual) {
+            registers_.set(Register::IP, value);
+          }
+          break;
+        }
       }
-#if PRINT_ASSEMBLY > 0
-      printf("0x%04x\n", addr);
-#endif
       break;
     }
 
-    case OpCode::JUMP_IF_NOT_EQUAL: {
-      auto addr = fetch16();
-      auto flags = registers_.flags();
-      if (flags & CompareFlags::NotEqual) {
-        registers_.ip(addr);
-      }
-#if PRINT_ASSEMBLY > 0
-      printf("0x%04x\n", addr);
-#endif
+    case InstructionType::Add: {
+      U16 left = fetch_value(instruction.destination);
+      U16 right = fetch_value(instruction.source);
+      U16 result = left + right;
+      store_value(instruction.destination, result);
       break;
     }
 
-    case OpCode::COMPARE_REG_TO_LIT: {
-      auto reg = Register(fetch());
-      auto value = fetch16();
-      auto register_value = registers_.get(reg);
-      U16 flags = 0;
-      if (register_value == value) flags |= CompareFlags::Equal;
-      if (register_value != value) flags |= CompareFlags::NotEqual;
-      if (register_value < value) flags |= CompareFlags::LessThan;
-      if (register_value <= value) flags |= CompareFlags::LessThanOrEqual;
-      if (register_value > value) flags |= CompareFlags::GreaterThan;
-      if (register_value >= value) flags |= CompareFlags::GreaterThanOrEqual;
-      registers_.flags(flags);
-#if PRINT_ASSEMBLY > 0
-      printf("%s, %d\n", register_to_string(reg), value);
-#endif
+    case InstructionType::Subtract: {
+      U16 left = fetch_value(instruction.destination);
+      U16 right = fetch_value(instruction.source);
+      U16 result = left - right;
+      store_value(instruction.destination, result);
       break;
     }
 
-    case OpCode::ADD: {
-      auto reg = Register(fetch());
-      auto value = fetch16();
-      registers_.set(reg, registers_.get(reg) + value);
-#if PRINT_ASSEMBLY > 0
-      printf("%s, %d\n", register_to_string(reg), value);
-#endif
+    case InstructionType::Multiply: {
+      U16 left = fetch_value(instruction.destination);
+      U16 right = fetch_value(instruction.source);
+      U16 result = left * right;
+      store_value(instruction.destination, result);
       break;
     }
 
-    case OpCode::SUBTRACT: {
-      auto reg = Register(fetch());
-      auto value = fetch16();
-      registers_.set(reg, registers_.get(reg) - value);
-#if PRINT_ASSEMBLY > 0
-      printf("%s, %d\n", register_to_string(reg), value);
-#endif
-      break;
-    }
-
-    case OpCode::MULTIPLY: {
-      auto reg = Register(fetch());
-      auto value = fetch16();
-      registers_.set(reg, registers_.get(reg) * value);
-#if PRINT_ASSEMBLY > 0
-      printf("%s, %d\n", register_to_string(reg), value);
-#endif
-      break;
-    }
-
-    case OpCode::HALT:
-#if PRINT_ASSEMBLY > 0
-      printf("\n");
-#endif
+    case InstructionType::Halt: {
       return StepResult::Halt;
-
-    default: {
-      printf("Invalid op_code: %d\n", U8(op_code));
-      assert(0);
     }
   }
 
@@ -174,6 +206,54 @@ void CPU::debug() {
     printf("%s: 0x%04x  ", register_to_string(Register(i)), registers_.get(Register(i)));
   }
   putchar('\n');
+}
+
+void CPU::decode(Instruction* instruction) {
+  instruction->type = InstructionType(fetch());
+  instruction->destination.meta = fetch();
+  instruction->destination.value = fetch16();
+  instruction->source.meta = fetch();
+  instruction->source.value = fetch16();
+}
+
+U16 CPU::fetch_value(const Operand& operand) {
+  switch (AddressingMode(operand.meta)) {
+    case AddressingMode::Immediate:
+      return operand.value;
+
+    case AddressingMode::Register:
+      return registers_.get(Register(operand.value));
+
+    case AddressingMode::Direct:
+      return memory_->fetch(operand.value);
+
+    case AddressingMode::Indirect: {
+      return memory_->fetch(registers_.get(Register(operand.value)));
+    }
+  }
+
+  assert(false);
+  return 0;
+}
+
+void CPU::store_value(const Operand& operand, U16 value) {
+  switch (AddressingMode(operand.meta)) {
+    case AddressingMode::Immediate:
+      assert(false);
+      break;
+
+    case AddressingMode::Register:
+      registers_.set(Register(operand.value), value);
+      break;
+
+    case AddressingMode::Direct:
+      memory_->store(operand.value, U8(value));
+      break;
+
+    case AddressingMode::Indirect:
+      memory_->store(registers_.get(Register(operand.value)), U8(value));
+      break;
+  }
 }
 
 }  // namespace vm

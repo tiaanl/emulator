@@ -2,6 +2,7 @@
 
 #include "memory.h"
 #include "op_codes.h"
+#include "vm/emulator/instruction.h"
 #include "vm/emulator/registers.h"
 
 namespace vm {
@@ -19,6 +20,8 @@ public:
 
   void debug();
 
+  void decode(Instruction* instruction);
+
   inline U8 fetch() {
     auto ip = registers_.ip();
     auto result = memory_->fetch(ip);
@@ -34,9 +37,8 @@ public:
   }
 
 private:
-  inline OpCode fetch_op_code() {
-    return OpCode{fetch()};
-  }
+  U16 fetch_value(const Operand& operand);
+  void store_value(const Operand& operand, U16 value);
 
   Memory* memory_;
 
