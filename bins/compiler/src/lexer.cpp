@@ -41,16 +41,24 @@ inline bool is_punctuation(char ch) {
 
 #define PEEK_CONTINUOUS(Predicate)                                                                 \
   [](auto source) {                                                                                \
-    return find_if_not(source, (Predicate));                                                       \
+    return front_until_not(source, (Predicate));                                                   \
   }
 
 #define PEEK_PUNCTUATION(Char)                                                                     \
   [](auto range) {                                                                                 \
     if (*range.begin() == (Char)) {                                                                \
-      return range.front(1);                                                                       \
+      return front(range, 1);                                                                      \
     }                                                                                              \
-    return range.front(0);                                                                         \
+    return Range<char>{};                                                                          \
   }
+
+Range<char> peek_identifier(Range<char> source) {
+  if (is_alpha(*source.begin())) {
+    return front_until_not(source, is_alpha_numeric);
+  }
+
+  return {};
+}
 
 using TokenTypeFunc = Range<char> (*)(Range<char>);
 
@@ -65,9 +73,9 @@ struct {
     {TokenType::Plus, PEEK_PUNCTUATION('+')},
     {TokenType::Minus, PEEK_PUNCTUATION('-')},
     {TokenType::NewLine, PEEK_CONTINUOUS(is_new_line)},
-    {TokenType::Whitespace, PEEK_CONTINUOUS(is_whitespace)},
-    {TokenType::Identifier, PEEK_CONTINUOUS(is_alpha)},
+    // {TokenType::Whitespace, PEEK_CONTINUOUS(is_whitespace)},
     {TokenType::Number, PEEK_CONTINUOUS(is_numeric)},
+    {TokenType::Identifier, peek_identifier},
 };
 
 }  // namespace
@@ -75,23 +83,25 @@ struct {
 Lexer::Lexer(Range<char> source) : source_(source), current_(source) {}
 
 Token Lexer::peek_token() {
-  if (current_.empty()) {
-    return {TokenType::EndOfSource, current_};
+  auto range_to_check = advance_until_not(current_, is_whitespace);
+
+  if (range_to_check.empty()) {
+    return {TokenType::EndOfSource, {}};
   }
 
   for (auto& token_entry : kTokenEntries) {
-    auto found = token_entry.func(current_);
+    auto found = token_entry.func(range_to_check);
     if (!found.empty()) {
       return {token_entry.type, found};
     }
   }
 
-  Token result{TokenType::Unknown, current_.front(1)};
+  Token result{TokenType::Unknown, front(current_, 1)};
   return result;
 }
 
 Token Lexer::consume_token() {
   auto token = peek_token();
-  current_ = current_.middle(token.data.length());
+  current_ = {token.data.end(), current_.end()};
   return token;
 }
