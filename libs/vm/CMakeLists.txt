@@ -1,9 +1,9 @@
 set(HEADER_FILES
     include/vm/assembler/assembler.h
     include/vm/assembler/disassembler.h
-    include/vm/emulator/bus.h
     include/vm/emulator/cpu.h
     include/vm/emulator/emulator.h
+    include/vm/emulator/instruction.h
     include/vm/emulator/memory.h
     include/vm/emulator/op_codes.h
     include/vm/emulator/registers.h
@@ -14,7 +14,6 @@ set(HEADER_FILES
 set(SOURCE_FILES
     src/assembler/assembler.cpp
     src/assembler/disassembler.cpp
-    src/emulator/bus.cpp
     src/emulator/cpu.cpp
     src/emulator/emulator.cpp
     src/emulator/memory.cpp
@@ -28,6 +27,7 @@ target_precompile_headers(vm PUBLIC include/vm/platform.h)
 set (TEST_FILES
     tests/emulator/address_tests.cpp
     tests/emulator/cpu_tests.cpp
+    tests/emulator/instruction_tests.cpp
     tests/vm_tests.cpp
     )
 

@@ -49,31 +49,11 @@ int main() {
   graphics_mode.init(g_screen_width, g_screen_height);
 
   vm::Emulator emulator;
-  if (!emulator.initialize()) {
-    return 1;
-  }
-  emulator.bus().add_range({0xA000, 0x0000}, U32(g_screen_width * g_screen_height),
-                           GraphicsMode::graphics_mode_fetch_func,
-                           GraphicsMode::graphics_mode_store_func, &graphics_mode);
 
   vm::Assembler a;
-
-  auto count = 0;
-  count += a.emit_mov_reg_from_lit(vm::Register::DS, 0xA000);
-  count += a.emit_mov_reg_from_lit(vm::Register::DI, 0x0000);
-  count += a.emit_mov_reg_from_lit(vm::Register::CX, 1);
-  // count += a.emit_multiply(vm::Register::CX, 0x10);
-  auto label_loop = a.label();
-  count += a.emit_mov_reg_addr_from_lit(vm::Register::DI, 255);
-  count += a.emit_add(vm::Register::DI, 1);
-  count += a.emit_subtract(vm::Register::CX, 1);
-  count += a.emit_compare_reg_to_lit(vm::Register::CX, 0);
-  count += a.emit_jump_if_not_equal(label_loop);
-  count += a.emit_halt();
+  a.emit_halt();
 
   emulator.upload_code(a.code(), a.size());
-
-  printf("Wrote %d bytes of instructions\n", count);
 
   //  vm::Disassembler d(memory.data(), memory.size());
   //  d.disassemble([](const char* line) { printf("%s\n", line); });

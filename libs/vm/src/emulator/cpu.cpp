@@ -56,8 +56,7 @@ StepResult CPU::step() {
     case OpCode::MOV_ADDR_FROM_LIT: {
       auto addr = fetch16();
       auto value = fetch();
-      auto ds = registers_.ds();
-      bus_->store({ds, addr}, value);
+      memory_->store(addr, value);
 #if PRINT_ASSEMBLY > 0
       printf("0x%04x, %d\n", addr, value);
 #endif
@@ -67,8 +66,7 @@ StepResult CPU::step() {
     case OpCode::MOV_REG_ADDR_FROM_LIT: {
       auto reg = Register(fetch());
       auto value = fetch();
-      auto ds = registers_.ds();
-      bus_->store({ds, registers_.get(reg)}, value);
+      memory_->store(registers_.get(reg), value);
 #if PRINT_ASSEMBLY > 0
       printf("[%s], %d\n", register_to_string(Register(reg)), value);
 #endif
@@ -86,8 +84,8 @@ StepResult CPU::step() {
 
     case OpCode::JUMP_IF_EQUAL: {
       auto addr = fetch16();
-      auto cf = registers_.cf();
-      if (cf & CompareFlags::Equal) {
+      auto flags = registers_.flags();
+      if (flags & CompareFlags::Equal) {
         registers_.ip(addr);
       }
 #if PRINT_ASSEMBLY > 0
@@ -98,8 +96,8 @@ StepResult CPU::step() {
 
     case OpCode::JUMP_IF_NOT_EQUAL: {
       auto addr = fetch16();
-      auto cf = registers_.cf();
-      if (cf & CompareFlags::NotEqual) {
+      auto flags = registers_.flags();
+      if (flags & CompareFlags::NotEqual) {
         registers_.ip(addr);
       }
 #if PRINT_ASSEMBLY > 0
@@ -112,14 +110,14 @@ StepResult CPU::step() {
       auto reg = Register(fetch());
       auto value = fetch16();
       auto register_value = registers_.get(reg);
-      U16 cf = 0;
-      if (register_value == value) cf |= CompareFlags::Equal;
-      if (register_value != value) cf |= CompareFlags::NotEqual;
-      if (register_value < value) cf |= CompareFlags::LessThan;
-      if (register_value <= value) cf |= CompareFlags::LessThanOrEqual;
-      if (register_value > value) cf |= CompareFlags::GreaterThan;
-      if (register_value >= value) cf |= CompareFlags::GreaterThanOrEqual;
-      registers_.cf(cf);
+      U16 flags = 0;
+      if (register_value == value) flags |= CompareFlags::Equal;
+      if (register_value != value) flags |= CompareFlags::NotEqual;
+      if (register_value < value) flags |= CompareFlags::LessThan;
+      if (register_value <= value) flags |= CompareFlags::LessThanOrEqual;
+      if (register_value > value) flags |= CompareFlags::GreaterThan;
+      if (register_value >= value) flags |= CompareFlags::GreaterThanOrEqual;
+      registers_.flags(flags);
 #if PRINT_ASSEMBLY > 0
       printf("%s, %d\n", register_to_string(reg), value);
 #endif

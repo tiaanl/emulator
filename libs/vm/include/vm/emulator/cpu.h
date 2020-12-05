@@ -1,7 +1,7 @@
 #pragma once
 
+#include "memory.h"
 #include "op_codes.h"
-#include "vm/emulator/bus.h"
 #include "vm/emulator/registers.h"
 
 namespace vm {
@@ -13,7 +13,7 @@ enum class StepResult : U8 {
 
 class CPU {
 public:
-  explicit CPU(Bus* bus) : bus_(bus) {}
+  explicit CPU(Memory* memory) : memory_{memory} {}
 
   StepResult step();
 
@@ -21,15 +21,14 @@ public:
 
   inline U8 fetch() {
     auto ip = registers_.ip();
-    auto result = bus_->fetch({registers_.cs(), ip});
+    auto result = memory_->fetch(ip);
     registers_.ip(ip + 1);
     return result;
   }
 
   inline U16 fetch16() {
-    auto cs = registers_.cs();
     auto ip = registers_.ip();
-    U16 result = U16(bus_->fetch({cs, ip})) | U16(bus_->fetch({cs, U16(ip + 1)}) << 8ul);
+    U16 result = U16(memory_->fetch(ip)) | U16(memory_->fetch(U16(ip + 1)) << 8ul);
     registers_.ip(ip + 2);
     return result;
   }
@@ -39,7 +38,8 @@ private:
     return OpCode{fetch()};
   }
 
-  Bus* bus_;
+  Memory* memory_;
+
   Registers registers_;
 };
 
