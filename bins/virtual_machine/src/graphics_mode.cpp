@@ -38,7 +38,7 @@ void main() {
 
 GLuint create_shader(GLenum shader_type, const char* source) {
   auto shader = glCreateShader(shader_type);
-  GLint length = strlen(source);
+  GLint length = GLint(strlen(source));
   glShaderSource(shader, 1, &source, &length);
   glCompileShader(shader);
 

@@ -3,6 +3,8 @@ macro(base_set_flags target)
         # Enable warnings and multi-process compilation.
         target_compile_options(${target} PUBLIC /W4 /WX /MP)
 
+        target_compile_definitions(${target} PUBLIC -D_CRT_SECURE_NO_WARNINGS)
+
         set_target_properties(${target} PROPERTIES
             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
             )

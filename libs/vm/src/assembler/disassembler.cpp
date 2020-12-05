@@ -19,40 +19,40 @@ AddressFrom<T> address_from(T from) {
 
 U16 output(char* data, AddressFrom<Register> address_from_register) {
   auto reg = Register(address_from_register.value);
-  return sprintf(data, "[%s]", register_to_string(reg));
+  return U16(sprintf(data, "[%s]", register_to_string(reg)));
 }
 
 U16 output(char* data, AddressFrom<U16> address_from_register) {
-  return sprintf(data, "[0x%04x]", address_from_register.value);
+  return U16(sprintf(data, "[0x%04x]", address_from_register.value));
 }
 
 U16 output(char* data, Register reg) {
-  return sprintf(data, "%s", register_to_string(reg));
+  return U16(sprintf(data, "%s", register_to_string(reg)));
 }
 
 U16 output(char* data, U16 value) {
-  return sprintf(data, "0x%04x", value);
+  return U16(sprintf(data, "0x%04x", value));
 }
 
 U8 build_line(char* buffer, U16 offset, OpCode op_code) {
-  return sprintf(buffer, "0x%04x:  %-6s", offset, op_code_to_string(op_code));
+  return U8(sprintf(buffer, "0x%04x:  %-6s", offset, op_code_to_string(op_code)));
 }
 
 template <typename A>
 U8 build_line(char* buffer, U16 offset, OpCode op_code, A&& a) {
-  auto o = build_line(buffer, offset, op_code);
+  int o = build_line(buffer, offset, op_code);
   o += output(buffer + o, a);
 
-  return o;
+  return U8(o);
 }
 
 template <typename A, typename B>
 U8 build_line(char* buffer, U16 offset, OpCode op_code, A&& a, B&& b) {
-  auto o = build_line(buffer, offset, op_code, a);
+  int o = build_line(buffer, offset, op_code, a);
   o += sprintf(buffer + o, ", ");
   o += output(buffer + o, b);
 
-  return o;
+  return U8(o);
 }
 
 }  // namespace

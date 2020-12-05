@@ -8,7 +8,7 @@ public:
 
   explicit Address(U32 address) : address_(address) {}
 
-  Address(U16 segment, U16 offset) : address_((segment << 0x08u) + offset) {}
+  Address(U16 segment, U16 offset) : address_((segment << 0x04u) + offset) {}
 
   bool operator==(const Address& right) const {
     return address_ == right.address_;
@@ -27,15 +27,15 @@ public:
     return Address(left.address_ + right);
   }
 
-  U16 segment() const {
-    return (address_ & 0xFFFF0000u) >> 0x08u;
+  [[nodiscard]] U16 segment() const {
+    return U16((address_ & 0xFFFF0000u) >> 0x04u);
   }
 
-  U16 offset() const {
-    return address_ & 0xFFFFu;
+  [[nodiscard]] U16 offset() const {
+    return U16(address_ & 0xFFFFu);
   }
 
-  U32 flat() const {
+  [[nodiscard]] U32 flat() const {
     return address_;
   }
 

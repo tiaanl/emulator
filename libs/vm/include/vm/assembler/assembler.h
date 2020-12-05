@@ -3,6 +3,8 @@
 #include "vm/emulator/cpu.h"
 #include "vm/emulator/op_codes.h"
 
+#include <vector>
+
 namespace vm {
 
 class Assembler {
@@ -14,7 +16,7 @@ public:
   }
 
   U16 size() const {
-    return data_.size();
+    return U16(data_.size());
   }
 
   U16 label() const;
