@@ -1,4 +1,4 @@
-#include "compiler/token.h"
+#include "compiler/token_type.h"
 
 #include <cassert>
 
@@ -34,13 +34,16 @@ const char* token_type_to_string(TokenType token_type) {
     case TokenType::Identifier:
       return "Identifier";
 
-    case TokenType::Number:
-      return "Number";
+    case TokenType::DecimalNumber:
+      return "DecimalNumber";
+
+    case TokenType::HexNumber:
+      return "HexNumber";
 
     case TokenType::Unknown:
       return "Unknown";
   }
 
   assert(false);
-  return "<invalid>";
+  return "???";
 }

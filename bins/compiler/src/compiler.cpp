@@ -1,30 +1,21 @@
-#include <cstdio>
-
+#include "compiler/ast.h"
 #include "compiler/lexer.h"
-
-void print_token(const Token& token) {
-  printf("Token: %s (%llu)\n", token_type_to_string(token.type), token.data.length());
-}
+#include "compiler/parser.h"
+#include "vm/assembler/assembler.h"
 
 int main() {
   auto source = R"(
-    MOV  ax, 10
+    MOV  R1, 10
     JMP  0x5000
-    MOV  [DS:DI], 0x30
-    MOV  AX, [BP+6-2]
+    MOV  [R2], 0x30
+    MOV  [0x30], 9
   )";
 
   Lexer lexer(range_from(source));
 
-  for (;;) {
-    auto token = lexer.consume_token();
-
-    print_token(token);
-
-    if (token.type == TokenType::EndOfSource || token.type == TokenType::Unknown) {
-      break;
-    }
-  }
+  auto parser = Parser{&lexer};
+  vm::Assembler assembler;
+  auto node = parser.parse_compound();
 
   return 0;
 }

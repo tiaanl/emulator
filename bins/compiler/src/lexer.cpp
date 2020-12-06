@@ -21,6 +21,10 @@ inline bool is_numeric(char ch) {
   return (ch >= '0' && ch <= '9');
 }
 
+inline bool is_hex_numeric(char ch) {
+  return ch == 'x' || ch == 'X' || is_numeric(ch);
+}
+
 inline bool is_alpha_numeric(char ch) {
   return is_alpha(ch) || is_numeric(ch);
 }
@@ -60,6 +64,23 @@ Range<char> peek_identifier(Range<char> source) {
   return {};
 }
 
+Range<char> peek_hex_number(Range<char> source) {
+  if (source.length() < 3) {
+    return {};
+  }
+
+  const char* c = source.begin();
+  if (c[0] != '0' || (c[1] != 'x' && c[1] != 'X')) {
+    return {};
+  }
+
+  if (is_numeric(*source.begin())) {
+    return front_until_not(source, is_hex_numeric);
+  }
+
+  return {};
+}
+
 using TokenTypeFunc = Range<char> (*)(Range<char>);
 
 struct {
@@ -73,14 +94,35 @@ struct {
     {TokenType::Plus, PEEK_PUNCTUATION('+')},
     {TokenType::Minus, PEEK_PUNCTUATION('-')},
     {TokenType::NewLine, PEEK_CONTINUOUS(is_new_line)},
-    // {TokenType::Whitespace, PEEK_CONTINUOUS(is_whitespace)},
-    {TokenType::Number, PEEK_CONTINUOUS(is_numeric)},
+    {TokenType::HexNumber, peek_hex_number},
+    {TokenType::DecimalNumber, PEEK_CONTINUOUS(is_numeric)},
     {TokenType::Identifier, peek_identifier},
 };
 
 }  // namespace
 
 Lexer::Lexer(Range<char> source) : source_(source), current_(source) {}
+
+void Lexer::push() {
+  stack_.push(current_);
+}
+
+void Lexer::pop() {
+  if (stack_.empty()) {
+    return;
+  }
+
+  current_ = stack_.top();
+  stack_.pop();
+}
+
+void Lexer::commit() {
+  if (stack_.empty()) {
+    return;
+  }
+
+  stack_.pop();
+}
 
 Token Lexer::peek_token() {
   auto range_to_check = advance_until_not(current_, is_whitespace);

@@ -17,7 +17,10 @@ enum class TokenType : U8 {
 
   // Literals
   Identifier,
-  Number,
+  DecimalNumber,
+  HexNumber,
 
   Unknown,
 };
+
+const char* token_type_to_string(TokenType token_type);

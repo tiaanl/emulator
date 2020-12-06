@@ -1,5 +1,7 @@
 set(HEADER_FILES
+    include/compiler/ast.h
     include/compiler/lexer.h
+    include/compiler/parser.h
     include/compiler/range.h
     include/compiler/token.h
     include/compiler/token_iterator.h
@@ -9,7 +11,8 @@ set(HEADER_FILES
 set(SOURCE_FILES
     src/compiler.cpp
     src/lexer.cpp
-    src/token.cpp
+    src/parser.cpp
+    src/token_type.cpp
     )
 
 base_add_executable(compiler ${SOURCE_FILES})

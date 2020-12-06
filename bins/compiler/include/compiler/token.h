@@ -9,5 +9,3 @@ struct Token {
 
   Token(TokenType type, Range<char> data) : type(type), data(data) {}
 };
-
-const char* token_type_to_string(TokenType token_type);
