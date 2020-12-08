@@ -9,6 +9,7 @@ set(HEADER_FILES
     )
 
 set(SOURCE_FILES
+    src/ast.cpp
     src/compiler.cpp
     src/lexer.cpp
     src/parser.cpp

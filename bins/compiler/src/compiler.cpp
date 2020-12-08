@@ -16,6 +16,9 @@ int main() {
   auto parser = Parser{&lexer};
   vm::Assembler assembler;
   auto node = parser.parse_compound();
+  if (node) {
+    node->emit(&assembler);
+  }
 
   return 0;
 }

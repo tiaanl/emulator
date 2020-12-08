@@ -9,39 +9,24 @@ namespace vm {
 class Assembler;
 }  // namespace vm
 
+enum class NodeType : U8 {
+  ImmediateOperand,
+  RegisterOperand,
+  DirectOperand,
+  IndirectOperand,
+
+  SingleOperandInstruction,
+  DoubleOperandInstruction,
+  Compound,
+};
+
 class Node {
 public:
   virtual ~Node() = default;
 
-  virtual void emit(vm::Assembler* assembler) = 0;
-};
+  virtual NodeType type() const = 0;
 
-class NumberNode : public Node {
-public:
-  ~NumberNode() override = default;
-
-protected:
-  U64 number_;
-};
-
-enum class BinaryOperationType : U8 {
-  Plus,
-  Minus,
-  Multiply,
-  Divide,
-};
-
-class BinaryNode : public Node {
-public:
-  BinaryNode(BinaryOperationType type, std::unique_ptr<Node> left, std::unique_ptr<Node> right)
-    : type_{type}, left_{std::move(left)}, right_{std::move(right)} {}
-
-  ~BinaryNode() override = default;
-
-protected:
-  BinaryOperationType type_;
-  std::unique_ptr<Node> left_;
-  std::unique_ptr<Node> right_;
+  virtual void emit(vm::Assembler*) {}
 };
 
 class OperandNode : public Node {
@@ -61,7 +46,13 @@ public:
 
   ~ImmediateOperandNode() override = default;
 
-  void emit(vm::Assembler*) override {}
+  U16 value() const {
+    return value_;
+  }
+
+  NodeType type() const override {
+    return NodeType::ImmediateOperand;
+  }
 
 protected:
   U16 value_;
@@ -70,14 +61,20 @@ protected:
 class RegisterOperandNode : public OperandNode {
 public:
   explicit RegisterOperandNode(vm::Register reg)
-    : OperandNode{vm::AddressingMode::Register}, register_{reg} {}
+    : OperandNode{vm::AddressingMode::Register}, reg_{reg} {}
 
   ~RegisterOperandNode() override = default;
 
-  void emit(vm::Assembler*) override {}
+  vm::Register reg() const {
+    return reg_;
+  }
+
+  NodeType type() const override {
+    return NodeType::RegisterOperand;
+  }
 
 protected:
-  vm::Register register_;
+  vm::Register reg_;
 };
 
 class DirectOperandNode : public OperandNode {
@@ -86,7 +83,13 @@ public:
 
   ~DirectOperandNode() override = default;
 
-  void emit(vm::Assembler*) override {}
+  U16 addr() const {
+    return addr_;
+  }
+
+  NodeType type() const override {
+    return NodeType::DirectOperand;
+  }
 
 protected:
   U16 addr_;
@@ -95,14 +98,20 @@ protected:
 class IndirectOperandNode : public OperandNode {
 public:
   explicit IndirectOperandNode(vm::Register reg)
-    : OperandNode{vm::AddressingMode::Indirect}, register_{reg} {}
+    : OperandNode{vm::AddressingMode::Indirect}, reg_{reg} {}
 
   ~IndirectOperandNode() override = default;
 
-  void emit(vm::Assembler*) override {}
+  vm::Register reg() const {
+    return reg_;
+  }
+
+  NodeType type() const override {
+    return NodeType::IndirectOperand;
+  }
 
 protected:
-  vm::Register register_;
+  vm::Register reg_;
 };
 
 class InstructionNode : public Node {
@@ -120,9 +129,14 @@ public:
   SingleOperandInstructionNode(vm::InstructionType instruction_type,
                                std::unique_ptr<OperandNode> destination)
     : InstructionNode{instruction_type}, destination_{std::move(destination)} {}
+
   ~SingleOperandInstructionNode() override = default;
 
-  void emit(vm::Assembler*) override {}
+  NodeType type() const override {
+    return NodeType::SingleOperandInstruction;
+  }
+
+  void emit(vm::Assembler* assembler) override;
 
 protected:
   std::unique_ptr<OperandNode> destination_;
@@ -136,9 +150,12 @@ public:
     : InstructionNode{instruction_type},
       destination_{std::move(destination)},
       source_{std::move(source)} {}
+
   ~DoubleOperandInstructionNode() override = default;
 
-  void emit(vm::Assembler*) override {}
+  NodeType type() const override {
+    return NodeType::DoubleOperandInstruction;
+  }
 
 protected:
   std::unique_ptr<OperandNode> destination_;
@@ -149,9 +166,18 @@ class CompoundNode : public Node {
 public:
   explicit CompoundNode(std::vector<std::unique_ptr<InstructionNode>> instructions)
     : instructions_(std::move(instructions)) {}
+
   ~CompoundNode() override = default;
 
-  void emit(vm::Assembler*) override {}
+  NodeType type() const override {
+    return NodeType::Compound;
+  }
+
+  void emit(vm::Assembler* assembler) override {
+    for (auto& instruction : instructions_) {
+      instruction->emit(assembler);
+    }
+  }
 
 protected:
   std::vector<std::unique_ptr<InstructionNode>> instructions_;

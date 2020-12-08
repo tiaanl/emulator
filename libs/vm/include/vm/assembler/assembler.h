@@ -35,8 +35,9 @@ public:
   U8 emit_compare_reg_to_lit(Register reg, U16 value);
   U8 emit_halt();
 
-private:
   U8 emit_instruction(const Instruction& instruction);
+
+private:
   U8 emit_operand(const Operand& operand);
 
   U8 emit_u8(U8 value);
