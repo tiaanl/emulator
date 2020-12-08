@@ -1,9 +1,11 @@
 #include "compiler/ast.h"
 
-#include "vm/assembler/assembler.h"
+#include <cstdio>
+
+#include "compiler/assembler.h"
 
 void SingleOperandInstructionNode::emit(vm::Assembler* assembler) {
-  vm::Instruction instruction;
+  vm::Instruction instruction = {};
   instruction.type = type_;
 
   switch (destination_->type()) {

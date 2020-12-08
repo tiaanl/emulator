@@ -1,4 +1,4 @@
-#include "vm/emulator/cpu.h"
+#include "vm/cpu.h"
 
 #include <cassert>
 #include <cstdio>

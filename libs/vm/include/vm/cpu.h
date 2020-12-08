@@ -2,8 +2,8 @@
 
 #include "memory.h"
 #include "op_codes.h"
-#include "vm/emulator/instruction.h"
-#include "vm/emulator/registers.h"
+#include "vm/instruction.h"
+#include "vm/registers.h"
 
 namespace vm {
 

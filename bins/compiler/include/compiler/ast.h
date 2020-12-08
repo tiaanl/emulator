@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "vm/emulator/instruction.h"
+#include "vm/instruction.h"
 
 namespace vm {
 class Assembler;

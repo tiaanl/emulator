@@ -2,8 +2,8 @@
 
 #include <functional>
 
-#include "vm/emulator/op_codes.h"
-#include "vm/emulator/registers.h"
+#include "vm/op_codes.h"
+#include "vm/registers.h"
 
 namespace vm {
 

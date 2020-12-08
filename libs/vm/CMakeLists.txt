@@ -1,33 +1,28 @@
 set(HEADER_FILES
-    include/vm/assembler/assembler.h
-    include/vm/assembler/disassembler.h
-    include/vm/emulator/cpu.h
-    include/vm/emulator/emulator.h
-    include/vm/emulator/instruction.h
-    include/vm/emulator/memory.h
-    include/vm/emulator/op_codes.h
-    include/vm/emulator/registers.h
-    include/vm/object_pool.h
-    include/vm/platform.h
+    include/vm/cpu.h
+    include/vm/emulator.h
+    include/vm/instruction.h
+    include/vm/memory.h
+    include/vm/op_codes.h
+    include/vm/registers.h
     )
 
 set(SOURCE_FILES
-    src/assembler/assembler.cpp
-    src/assembler/disassembler.cpp
-    src/emulator/cpu.cpp
-    src/emulator/emulator.cpp
-    src/emulator/memory.cpp
-    src/emulator/op_codes.cpp
-    src/emulator/registers.cpp
+    src/cpu.cpp
+    src/emulator.cpp
+    src/instruction.cpp
+    src/memory.cpp
+    src/op_codes.cpp
+    src/registers.cpp
     )
 
 base_add_library(vm ${HEADER_FILES} ${SOURCE_FILES})
-target_precompile_headers(vm PUBLIC include/vm/platform.h)
+target_link_libraries(vm PUBLIC base)
 
 set (TEST_FILES
-    tests/emulator/address_tests.cpp
-    tests/emulator/cpu_tests.cpp
-    tests/emulator/instruction_tests.cpp
+    tests/address_tests.cpp
+    tests/cpu_tests.cpp
+    tests/instruction_tests.cpp
     tests/vm_tests.cpp
     )
 

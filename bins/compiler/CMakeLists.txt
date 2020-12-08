@@ -1,5 +1,7 @@
 set(HEADER_FILES
+    include/compiler/assembler.h
     include/compiler/ast.h
+    include/compiler/disassembler.h
     include/compiler/lexer.h
     include/compiler/parser.h
     include/compiler/range.h
@@ -9,8 +11,10 @@ set(HEADER_FILES
     )
 
 set(SOURCE_FILES
+    src/assembler.cpp
     src/ast.cpp
     src/compiler.cpp
+    src/disassembler.cpp
     src/lexer.cpp
     src/parser.cpp
     src/token_type.cpp

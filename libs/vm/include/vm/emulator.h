@@ -1,7 +1,7 @@
 #pragma once
 
-#include "vm/emulator/cpu.h"
-#include "vm/emulator/memory.h"
+#include "vm/cpu.h"
+#include "vm/memory.h"
 
 namespace vm {
 

@@ -1,4 +1,4 @@
-#include "vm/assembler/disassembler.h"
+#include "../include/compiler/disassembler.h"
 
 #include <cassert>
 #include <cstdio>

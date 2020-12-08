@@ -2,11 +2,9 @@
 // After glad/glad.h
 #include <GLFW/glfw3.h>
 #include <virtual_machine/graphics_mode.h>
-#include <vm/assembler/assembler.h>
-#include <vm/assembler/disassembler.h>
-#include <vm/emulator/cpu.h>
-#include <vm/emulator/emulator.h>
-#include <vm/emulator/memory.h>
+#include <vm/cpu.h>
+#include <vm/emulator.h>
+#include <vm/memory.h>
 
 #include <cstdio>
 #include <thread>
@@ -50,22 +48,6 @@ int main() {
   graphics_mode.init(g_screen_width, g_screen_height);
 
   vm::Emulator emulator;
-
-  vm::Assembler a;
-  auto start = a.label();
-  a.emit_mov_reg_from_lit(vm::Register::R1, 72);
-  a.emit_mov_reg_from_reg(vm::Register::R2, vm::Register::R1);
-  a.emit_compare_reg_to_lit(vm::Register::R2, 7);
-  a.emit_jump_if_equal(start);
-  a.emit_add(vm::Register::R2, 9);
-  a.emit_subtract(vm::Register::R2, 2);
-  a.emit_multiply(vm::Register::R2, 4);
-  a.emit_halt();
-
-  emulator.upload_code(a.code(), a.size());
-
-  //  vm::Disassembler d(memory.data(), memory.size());
-  //  d.disassemble([](const char* line) { printf("%s\n", line); });
 
   glfwShowWindow(window);
 

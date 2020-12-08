@@ -1,4 +1,4 @@
-#include "vm/emulator/registers.h"
+#include "vm/registers.h"
 
 #include <cassert>
 

@@ -1,5 +1,4 @@
-#ifndef PLATFORM_H_
-#define PLATFORM_H_
+#pragma once
 
 using U8 = unsigned char;
 using U16 = unsigned short;
@@ -32,5 +31,3 @@ using MemDiff = I64;
 
 static_assert(sizeof(MemSize) == 8);
 static_assert(sizeof(MemDiff) == 8);
-
-#endif  // PLATFORM_H_

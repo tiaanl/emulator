@@ -1,7 +1,7 @@
-#include "vm/assembler/assembler.h"
+#include "compiler/assembler.h"
 
-#include "vm/emulator/cpu.h"
-#include "vm/emulator/op_codes.h"
+#include "vm/cpu.h"
+#include "vm/op_codes.h"
 
 namespace vm {
 

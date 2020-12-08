@@ -1,6 +1,6 @@
 #pragma once
 
-#include "compiler/range.h"
+#include "base/range.h"
 #include "compiler/token_type.h"
 
 struct Token {

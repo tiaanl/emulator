@@ -1,7 +1,10 @@
-#include "compiler/ast.h"
+#include <compiler/disassembler.h>
+
+#include <cstdio>
+
+#include "compiler/assembler.h"
 #include "compiler/lexer.h"
 #include "compiler/parser.h"
-#include "vm/assembler/assembler.h"
 
 int main() {
   auto source = R"(
@@ -19,6 +22,11 @@ int main() {
   if (node) {
     node->emit(&assembler);
   }
+
+  vm::Disassembler disassembler{(U8*)assembler.code(), U16(assembler.size())};
+  disassembler.disassemble([](const char* line) {
+    printf("%s\n", line);
+  });
 
   return 0;
 }

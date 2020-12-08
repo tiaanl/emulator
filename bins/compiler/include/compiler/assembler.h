@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "vm/emulator/cpu.h"
-#include "vm/emulator/instruction.h"
-#include "vm/emulator/op_codes.h"
+#include "vm/cpu.h"
+#include "vm/instruction.h"
+#include "vm/op_codes.h"
 
 namespace vm {
 

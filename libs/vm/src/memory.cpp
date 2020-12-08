@@ -1,4 +1,4 @@
-#include "vm/emulator/memory.h"
+#include "vm/memory.h"
 
 namespace vm {
 

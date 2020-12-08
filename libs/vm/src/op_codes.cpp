@@ -1,4 +1,4 @@
-#include "vm/emulator/op_codes.h"
+#include "vm/op_codes.h"
 
 #include <cassert>
 #include <cstdio>

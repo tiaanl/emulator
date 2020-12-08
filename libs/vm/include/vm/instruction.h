@@ -1,6 +1,8 @@
 #pragma once
 
-#include "vm/emulator/registers.h"
+#include <base/range.h>
+
+#include "vm/registers.h"
 
 namespace vm {
 
@@ -35,7 +37,7 @@ enum class JumpCondition : U8 {
   IfNotEqual,
 };
 
-struct Operand {
+struct alignas(4) Operand {
   U8 meta;
   U16 value;
 };
@@ -56,10 +58,13 @@ inline Operand operand_indirect(Register reg) {
   return {U8(AddressingMode::Indirect), U16(reg)};
 }
 
-struct Instruction {
+struct alignas(16) Instruction {
   InstructionType type;
   Operand destination;
   Operand source;
 };
+
+bool encode(Instruction* instruction, Range<char> dest);
+bool decode(Instruction* instruction, Range<char> source);
 
 }  // namespace vm

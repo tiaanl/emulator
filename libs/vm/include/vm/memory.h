@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vm/emulator/address.h"
+#include "vm/address.h"
 
 namespace vm {
 
